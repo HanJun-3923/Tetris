@@ -12,6 +12,8 @@ using namespace std;
 #define initial_x 20
 #define initial_y 5
 
+#define len_next_x 12
+
 #define LEFT 75 // ←
 #define RIGHT 77  // →
 #define UP 72 // ↑
@@ -25,7 +27,7 @@ using namespace std;
 10 = wall  ///▩
 -1 = "ghost"  /// □ (no color)
 */
-int table_data[length_x][length_y];
+int table_data[length_x + len_next_x][length_y];
 int rot; //rotation
 int x = initial_x + (length_x / 2 - 4), y = initial_y + 1;
 int shape[4][4][4];
@@ -33,6 +35,7 @@ int block_next[14]; // 7 blocks(1 bag) x 2
 int hold = -1;
 int re_next_count = -1;
 bool can_hold = true;
+
 
 //O I S Z L J T 순서
 const int block1[4][4][4] = {
@@ -302,15 +305,25 @@ void clear_gametable()
             if ((1 <= table_data[i][j] && table_data[i][j] <= 7) || table_data[i][j] == -1) table_data[i][j] = 0;
         }
     }
-    for (int i = 2; i < length_x - 2; i++) {
+    for (int i = 2; i < length_x + len_next_x - 2; i++) {
         for (int j = 1; j < length_y - 1; j++) {
             gotoxy(initial_x + i, initial_y + j);
-            printf(" ");
+            if (table_data[i][j] != 10 && !(11 <= table_data[i][j] && table_data[i][j] <= 17))
+                printf(" ");
+        }
+    }
+
+
+}
+void clear_next_block() {
+    for (int i = length_x; i < length_x + len_next_x; i++) {
+        for (int j = 0; j < length_y; j++) {
+            table_data[i][j] = 0;
         }
     }
 }
 void draw_gametable() {
-    for (int fx = 0; fx < length_x; fx++) {
+    for (int fx = 0; fx < length_x + len_next_x; fx++) {
         for (int fy = 0; fy < length_y; fy++) {
             if (table_data[fx][fy] == 0 || table_data[fx][fy] == 10) continue;
             else if (1 <= table_data[fx][fy] && table_data[fx][fy] <= 7) {
@@ -385,9 +398,9 @@ void draw_gametable() {
     }
 }
 void print_gametable_data() {
-    gotoxy(initial_x + length_x + 10, initial_y);
+    gotoxy(initial_x + length_x + 14, initial_y);
     for (int i = 0; i < length_y; i++) {
-        for (int j = 0; j < length_x; j++) {
+        for (int j = 0; j < length_x + len_next_x; j++) {
             if (table_data[j][i] == 10) {
                 if (j % 2 == 0)
                     cout << "▩";
@@ -406,75 +419,154 @@ void print_gametable_data() {
                 else cout << table_data[j][i];
             }
         }
-        gotoxy(initial_x + length_x + 10, initial_y + i + 1);
+        gotoxy(initial_x + length_x + 14, initial_y + i + 1);
     }
 }
+
 
 class Block
 {
 protected:
     int gy = initial_y;
+    int next_shape[4][4][4] = { };
 public:
 
-    void set_block1() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    shape[i][k][j] = block1[i][j][k];
+    void set_block1(int n) {
+        if (n == 1) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        shape[i][k][j] = block1[i][j][k];
+                    }
+                }
+            }
+        }
+        else if (n == 2) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        next_shape[i][k][j] = block1[i][j][k];
+                    }
                 }
             }
         }
     }
-    void set_block2() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    shape[i][k][j] = block2[i][j][k];
+    void set_block2(int n) {
+        if (n == 1) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        shape[i][k][j] = block2[i][j][k];
+                    }
+                }
+            }
+        }
+        else if (n == 2) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        next_shape[i][k][j] = block2[i][j][k];
+                    }
                 }
             }
         }
     }
-    void set_block3() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    shape[i][k][j] = block3[i][j][k];
+    void set_block3(int n) {
+        if (n == 1) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        shape[i][k][j] = block3[i][j][k];
+                    }
+                }
+            }
+        }
+        else if (n == 2) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        next_shape[i][k][j] = block3[i][j][k];
+                    }
                 }
             }
         }
     }
-    void set_block4() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    shape[i][k][j] = block4[i][j][k];
+    void set_block4(int n) {
+        if (n == 1) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        shape[i][k][j] = block4[i][j][k];
+                    }
+                }
+            }
+        }
+        else if (n == 2) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        next_shape[i][k][j] = block4[i][j][k];
+                    }
                 }
             }
         }
     }
-    void set_block5() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    shape[i][k][j] = block5[i][j][k];
+    void set_block5(int n) {
+        if (n == 1) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        shape[i][k][j] = block5[i][j][k];
+                    }
+                }
+            }
+        }
+        else if (n == 2) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        next_shape[i][k][j] = block5[i][j][k];
+                    }
                 }
             }
         }
     }
-    void set_block6() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    shape[i][k][j] = block6[i][j][k];
+    void set_block6(int n) {
+        if (n == 1) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        shape[i][k][j] = block6[i][j][k];
+                    }
+                }
+            }
+        }
+        else if (n == 2) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        next_shape[i][k][j] = block6[i][j][k];
+                    }
                 }
             }
         }
     }
-    void set_block7() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                for (int k = 0; k < 4; k++) {
-                    shape[i][k][j] = block7[i][j][k];
+    void set_block7(int n) {
+        if (n == 1) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        shape[i][k][j] = block7[i][j][k];
+                    }
+                }
+            }
+        }
+        else if (n == 2) {
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < 4; k++) {
+                        next_shape[i][k][j] = block7[i][j][k];
+                    }
                 }
             }
         }
@@ -554,6 +646,7 @@ public:
         }
         if (can_hold == false) can_hold = true;
         rot = 0;
+        //set_nexts_and_hold();
     }
 
     bool ghost_can_print() {
@@ -696,20 +789,37 @@ public:
             goto Re_second_bag;
         }
 
-        if (block_next[re_next_count] == 1) set_block1();
-        else if (block_next[re_next_count] == 2) set_block2();
-        else if (block_next[re_next_count] == 3) set_block3();
-        else if (block_next[re_next_count] == 4) set_block4();
-        else if (block_next[re_next_count] == 5) set_block5();
-        else if (block_next[re_next_count] == 6) set_block6();
-        else if (block_next[re_next_count] == 7) set_block7();
+        if (block_next[re_next_count] == 1) set_block1(1);
+        else if (block_next[re_next_count] == 2) set_block2(1);
+        else if (block_next[re_next_count] == 3) set_block3(1);
+        else if (block_next[re_next_count] == 4) set_block4(1);
+        else if (block_next[re_next_count] == 5) set_block5(1);
+        else if (block_next[re_next_count] == 6) set_block6(1);
+        else if (block_next[re_next_count] == 7) set_block7(1);
 
         re_next_count++;
 
     }
-    void show_nexts_and_hold() {
+    void print_next_block() {
+        clear_next_block();
+        for (int k = 0; k < 5; k++) {
+            if (block_next[re_next_count + k] == 1) set_block1(2);
+            else if (block_next[re_next_count + k] == 2) set_block2(2);
+            else if (block_next[re_next_count + k] == 3) set_block3(2);
+            else if (block_next[re_next_count + k] == 4) set_block4(2);
+            else if (block_next[re_next_count + k] == 5) set_block5(2);
+            else if (block_next[re_next_count + k] == 6) set_block6(2);
+            else if (block_next[re_next_count + k] == 7) set_block7(2);
 
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 3; j++) {
+                    table_data[length_x + 2 * i + 1][4 * k + j - k] = next_shape[0][i][j];
+                    table_data[length_x + 2 * i + 2][4 * k + j - k] = next_shape[0][i][j];
+                }
+            }
+        }
     }
+
 
 };
 class GamePlay : public Block
@@ -726,10 +836,11 @@ public:
 
         block.next_block(); //초기 블럭, 넥스트 블럭 결정
         block.print_block(); //초기 블럭 데이터 입력
+        block.print_next_block();
         draw_gametable();
 
         print_gametable_data(); //test
-
+        //set_nexts_and_hold();
 
 
         clock_t start, end;
@@ -802,6 +913,7 @@ public:
                     clear_gametable();
                     x = initial_x + (length_x / 2 - 4), y = initial_y + 1;
                     block.print_block();
+                    block.print_next_block();
                     next_block = false;
                 }
                 else if (block.can_print()) {
@@ -815,13 +927,7 @@ public:
 
 
                 print_gametable_data(); //test
-                gotoxy(0, 0);
-                for (int i = 0; i < 14; i++) {
-                    cout << block_next[i] << " ";
-                }
-                cout << endl;
-                cout << "hold = " << hold << "  " << endl;; //hold 오류있음
-                cout << "re_next_count = " << re_next_count << endl;
+
                 /*
                 print_variables(); //test
                 gotoxy(x, y); //test
