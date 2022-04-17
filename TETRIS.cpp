@@ -4,6 +4,7 @@
 #include <time.h>
 using namespace std;
 //github hi~
+//no hi ¤»¤·
 #define length_x 24
 #define length_y 25
 #define initial_x 20
