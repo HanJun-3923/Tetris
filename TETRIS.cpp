@@ -11,13 +11,13 @@ using namespace std;
 #define initial_x 20
 #define initial_y 5
 
-#define LEFT 75 // ¡ç
-#define RIGHT 77  // ¡æ
-#define UP 72 // ¡è
-#define DOWN 80 // ¡é
+#define LEFT 75 // â†
+#define RIGHT 77  // â†’
+#define UP 72 // â†‘
+#define DOWN 80 // â†“
 
-//¡à ¡á ¡Û ¡Ü ¢Ì ¢Ç ¢È ¢É ¢Ê ¢Ë ¢Ã ¢Á
-//µ¥ÀÌÅÍ ¹øÈ£ 1 ~ 7 = "block", 0 = " ", 10 = "¢Ì", 9 = "¡á", 8 = "¢Ã",  -1 = "ghost"
+//â–¡ â–  â—‹ â— â–© â–¤ â–¥ â–¨ â–§ â–¦ â–£ âŠ™
+//ë°ì´í„° ë²ˆí˜¸ 1 ~ 7 = "block", 0 = " ", 10 = "â–©", 9 = "â– ", 8 = "â–£",  -1 = "ghost"
 int table_data[length_x][length_y];
 int rot; //rotation
 int x = initial_x + (length_x / 2 - 4), y = initial_y + 1;
@@ -27,7 +27,7 @@ int hold = -1;
 int re_next_count = -1;
 bool can_hold = true;
 
-//O I S Z L J T ¼ø¼­
+//O I S Z L J T ìˆœì„œ
 const int block1[4][4][4] = {
         {
                         {0, 0, 0, 0},
@@ -233,7 +233,7 @@ const int block7[4][4][4] = {
 
 };
 
-//±âº» ÇÔ¼öµé
+//ê¸°ë³¸ í•¨ìˆ˜ë“¤
 void gotoxy(short x, short y) { // Windows.h
     COORD pos{ x, y };
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
@@ -250,14 +250,14 @@ void CursorView(char show) {
     SetConsoleCursorInfo(hConsole, &ConsoleCursor);
 }
 
-//¸ŞÀÎ ÇÔ¼öµé
+//ë©”ì¸ í•¨ìˆ˜ë“¤
 void draw_frame(int len_x, int len_y, int i_x, int i_y) {
     int pos[2] = { i_x, i_y };
-    len_x--; //º¸Á¤
+    len_x--; //ë³´ì •
     for (int i = 0; i <= len_x; i++) {
         if (i % 2 == 0) {
             gotoxy(pos[0] + i, pos[1]);
-            cout << "¢Ì";
+            cout << "â–©";
         }
         table_data[i][0] = 10;
     }
@@ -265,21 +265,21 @@ void draw_frame(int len_x, int len_y, int i_x, int i_y) {
     for (int i = 0; i <= len_x; i++) {
         if (i % 2 == 0) {
             gotoxy(pos[0] + i, pos[1] + len_y - 1);
-            cout << "¢Ì";
+            cout << "â–©";
         }
         table_data[i][length_y - 1] = 10;
     }
 
     for (int i = 1; i < len_y - 1; i++) {
         gotoxy(pos[0], pos[1] + i);
-        cout << "¢Ì";
+        cout << "â–©";
         table_data[0][i] = 10;
         table_data[1][i] = 10;
     }
 
     for (int i = 1; i < len_y - 1; i++) {
         gotoxy(pos[0] + len_x - 1, pos[1] + i);
-        cout << "¢Ì";
+        cout << "â–©";
         table_data[length_x - 2][i] = 10;
         table_data[length_x - 1][i] = 10;
     }
@@ -305,19 +305,19 @@ void draw_gametable() {
             else if (table_data[fx][fy] == 9) {
                 if (fx % 2 == 0) {
                     gotoxy(fx + initial_x, fy + initial_y);
-                    cout << "¡á";
+                    cout << "â– ";
                 }
             }
             else if (table_data[fx][fy] == 8) {
                 if (fx % 2 == 0) {
                     gotoxy(fx + initial_x, fy + initial_y);
-                    cout << "¢Ã";
+                    cout << "â–£";
                 }
             }
             else if (table_data[fx][fy] == -1) {
                 if (fx % 2 == 0) {
                     gotoxy(fx + initial_x, fy + initial_y);
-                    cout << "¡à";
+                    cout << "â–¡";
                 }
             }
         }
@@ -329,7 +329,7 @@ void print_gametable_data() {
         for (int j = 0; j < length_x; j++) {
             if (table_data[j][i] == 10) {
                 if (j % 2 == 0)
-                    cout << "¢Ì";
+                    cout << "â–©";
 
             }
             else if (table_data[j][i] == -1) {
@@ -619,10 +619,10 @@ public:
         bool next_block = false;
         rot = 0;
 
-        draw_frame(length_x, length_y, initial_x, initial_y); // frame ±×¸®±â
+        draw_frame(length_x, length_y, initial_x, initial_y); // frame ê·¸ë¦¬ê¸°
 
-        block.next_block(); //ÃÊ±â ºí·°, ³Ø½ºÆ® ºí·° °áÁ¤
-        block.print_block(); //ÃÊ±â ºí·° µ¥ÀÌÅÍ ÀÔ·Â
+        block.next_block(); //ì´ˆê¸° ë¸”ëŸ­, ë„¥ìŠ¤íŠ¸ ë¸”ëŸ­ ê²°ì •
+        block.print_block(); //ì´ˆê¸° ë¸”ëŸ­ ë°ì´í„° ì…ë ¥
         draw_gametable();
 
         print_gametable_data(); //test
@@ -633,7 +633,7 @@ public:
         float time = 0;
         start = clock();
 
-        while (true) //Å° ÀÔ·Â
+        while (true) //í‚¤ ì…ë ¥
         {
             int key;
             end = clock();
@@ -690,7 +690,7 @@ public:
                     //game_pause();
                     break;
                 }
-                //Å° ÀÔ·Â ³¡
+                //í‚¤ ì…ë ¥ ë
 
 
 
@@ -717,12 +717,12 @@ public:
                     cout << block_next[i] << " ";
                 }
                 cout << endl;
-                cout << "hold = " << hold << "  " << endl;; //hold ¿À·ùÀÖÀ½
+                cout << "hold = " << hold << "  " << endl;; //hold ì˜¤ë¥˜ìˆìŒ
                 cout << "re_next_count = " << re_next_count << endl;
                 /*
                 print_variables(); //test
                 gotoxy(x, y); //test
-                printf("¡Ü"); //test
+                printf("â—"); //test
                 */
             }
         }
@@ -738,7 +738,7 @@ int main()
     gotoxy(0, 30);
 }
 
-// °Ë»ç
+// ê²€ì‚¬
 
 
 
