@@ -2,103 +2,147 @@
 #include <conio.h>
 #include <Windows.h>
 #include <time.h>
+#include <stdlib.h>
+
 using namespace std;
-//github hi~
-//no hi §ª§∑
+
 #define length_x 24
 #define length_y 25
 #define initial_x 20
 #define initial_y 5
 
-#define LEFT 75 // °Á
-#define RIGHT 77  // °Ê
-#define UP 72 // °Ë
-#define DOWN 80 // °È
+#define LEFT 75 // ‚Üê
+#define RIGHT 77  // ‚Üí
+#define UP 72 // ‚Üë
+#define DOWN 80 // ‚Üì
 
-//°‡ °· °€ °‹ ¢Ã ¢« ¢» ¢… ¢  ¢À ¢√ ¢¡
-int table_data[length_x][length_y]; // ≈◊¿Ã∫Ì ∆« 0 = " ", 1 = "¢Ã" , 2  = "°·", 3 = "¢√"
-// ¿ÃªÛ¿˚¿Œ µ•¿Ã≈Õ π¯»£ 1 ~ 7 = "block", 0 = " ", 10 = "¢Ã", 9 = "°·", 8 = "¢√",  -1 = "ghost"
+//‚ñ° ‚ñ† ‚óã ‚óè ‚ñ© ‚ñ§ ‚ñ• ‚ñ® ‚ñß ‚ñ¶ ‚ñ£ ‚äô
+//Îç∞Ïù¥ÌÑ∞ Î≤àÌò∏ 1 ~ 7 = "block", 0 = " ", 10 = "‚ñ©", 9 = "‚ñ†", 8 = "‚ñ£",  -1 = "ghost"
+int table_data[length_x][length_y];
 int rot; //rotation
 int x = initial_x + (length_x / 2 - 4), y = initial_y + 1;
 int shape[4][4][4];
+int block_next[14]; // 7 blocks(1 bag) x 2
+int hold = -1;
+int re_next_count = -1;
+bool can_hold = true;
 
+//O I S Z L J T ÏàúÏÑú
 const int block1[4][4][4] = {
         {
                         {0, 0, 0, 0},
-                        {0, 0, 0, 0},
-                        {9, 9, 9, 9},
+                        {0, 9, 9, 0},
+                        {0, 9, 9, 0},
                         {0, 0, 0, 0}
         },
         {
-                        {0, 0, 9, 0},
-                        {0, 0, 9, 0},
-                        {0, 0, 9, 0},
-                        {0, 0, 9, 0}
-
-        },
-        {
                         {0, 0, 0, 0},
-                        {0, 0, 0, 0},
-                        {9, 9, 9, 9},
+                        {0, 9, 9, 0},
+                        {0, 9, 9, 0},
                         {0, 0, 0, 0}
-
         },
         {
-                        {0, 0, 9, 0},
-                        {0, 0, 9, 0},
-                        {0, 0, 9, 0},
-                        {0, 0, 9, 0}
+                        {0, 0, 0, 0},
+                        {0, 9, 9, 0},
+                        {0, 9, 9, 0},
+                        {0, 0, 0, 0}
+        },
+        {
+                        {0, 0, 0, 0},
+                        {0, 9, 9, 0},
+                        {0, 9, 9, 0},
+                        {0, 0, 0, 0}
         },
 
 };
 const int block2[4][4][4] = {
         {
                         {0, 0, 0, 0},
-                        {0, 9, 9, 0},
-                        {0, 9, 9, 0},
+                        {9, 9, 9, 9},
+                        {0, 0, 0, 0},
                         {0, 0, 0, 0}
         },
         {
-                        {0, 0, 0, 0},
-                        {0, 9, 9, 0},
-                        {0, 9, 9, 0},
-                        {0, 0, 0, 0}
+                        {0, 9, 0, 0},
+                        {0, 9, 0, 0},
+                        {0, 9, 0, 0},
+                        {0, 9, 0, 0}
+
         },
         {
                         {0, 0, 0, 0},
-                        {0, 9, 9, 0},
-                        {0, 9, 9, 0},
+                        {0, 0, 0, 0},
+                        {9, 9, 9, 9},
                         {0, 0, 0, 0}
+
         },
         {
-                        {0, 0, 0, 0},
-                        {0, 9, 9, 0},
-                        {0, 9, 9, 0},
-                        {0, 0, 0, 0}
+                        {0, 0, 9, 0},
+                        {0, 0, 9, 0},
+                        {0, 0, 9, 0},
+                        {0, 0, 9, 0}
         },
 
 };
 const int block3[4][4][4] = {
         {
-                        {0, 9, 0, 0},
-                        {0, 9, 0, 0},
+                        {0, 0, 0, 0},
                         {0, 9, 9, 0},
+                        {9, 9, 0, 0},
+                        {0, 0, 0, 0}
+
+        },
+        {
+                        {9, 0, 0, 0},
+                        {9, 9, 0, 0},
+                        {0, 9, 0, 0},
                         {0, 0, 0, 0}
         },
         {
                         {0, 0, 0, 0},
-                        {0, 9, 9, 9},
-                        {0, 9, 0, 0},
+                        {0, 9, 9, 0},
+                        {9, 9, 0, 0},
                         {0, 0, 0, 0}
 
         },
         {
+                        {0, 9, 0, 0},
                         {0, 9, 9, 0},
                         {0, 0, 9, 0},
-                        {0, 0, 9, 0},
+                        {0, 0, 0, 0}
+        },
+
+};
+const int block4[4][4][4] = {
+        {
+                        {0, 0, 0, 0},
+                        {9, 9, 0, 0},
+                        {0, 9, 9, 0},
                         {0, 0, 0, 0}
 
         },
+        {
+                        {0, 0, 0, 0},
+                        {0, 9, 0, 0},
+                        {9, 9, 0, 0},
+                        {9, 0, 0, 0}
+        },
+        {
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                        {9, 9, 0, 0},
+                        {0, 9, 9, 0}
+
+        },
+        {
+                        {0, 0, 0, 0},
+                        {0, 0, 9, 0},
+                        {0, 9, 9, 0},
+                        {0, 9, 0, 0}
+        },
+
+};
+const int block5[4][4][4] = {
         {
                         {0, 0, 0, 0},
                         {0, 0, 9, 0},
@@ -106,70 +150,90 @@ const int block3[4][4][4] = {
                         {0, 0, 0, 0}
 
         },
-
-};
-const int block4[4][4][4] = {
         {
                         {0, 0, 0, 0},
+                        {9, 9, 0, 0},
                         {0, 9, 0, 0},
-                        {0, 9, 9, 0},
-                        {0, 0, 9, 0}
+                        {0, 9, 0, 0}
+
         },
         {
                         {0, 0, 0, 0},
-                        {0, 9, 9, 0},
-                        {9, 9, 0, 0},
-                        {0, 0, 0, 0}
+                        {0, 0, 0, 0},
+                        {9, 9, 9, 0},
+                        {9, 0, 0, 0}
 
         },
         {
                         {0, 0, 0, 0},
                         {0, 9, 0, 0},
-                        {0, 9, 9, 0},
+                        {0, 9, 0, 0},
+                        {0, 9, 9, 0}
+        },
+
+};
+const int block6[4][4][4] = {
+        {
+                        {0, 0, 0, 0},
+                        {9, 0, 0, 0},
+                        {9, 9, 9, 0},
+                        {0, 0, 0, 0}
+        },
+        {
+                        {0, 9, 0, 0 },
+                        {0, 9, 0, 0},
+                        {0, 9, 0, 0},
+                        {9, 9, 0, 0}
+
+        },
+        {
+                        {0, 0, 0, 0},
+                        {0, 0, 0, 0},
+                        {9, 9, 9, 0},
                         {0, 0, 9, 0}
 
         },
         {
                         {0, 0, 0, 0},
                         {0, 9, 9, 0},
+                        {0, 9, 0, 0},
+                        {0, 9, 0, 0}
+
+        },
+
+};
+const int block7[4][4][4] = {
+        {
+                        {0, 0, 0, 0},
+                        {0, 9, 0, 0},
+                        {9, 9, 9, 0},
+                        {0, 0, 0, 0}
+        },
+        {
+                        {0, 0, 0, 0},
+                        {0, 9, 0, 0},
                         {9, 9, 0, 0},
-                        {0, 0, 0, 0}
+                        {0, 9, 0, 0}
 
         },
-
-};
-const int block5[4][4][4] = {
         {
                         {0, 0, 0, 0},
-                        {0, 9, 9, 9},
-                        {0, 0, 9, 0},
-                        {0, 0, 0, 0}
+                        {0, 0, 0, 0},
+                        {9, 9, 9, 0},
+                        {0, 9, 0, 0}
+
         },
         {
-                        {0, 0, 9, 0},
+                        {0, 0, 0, 0},
+                        {0, 9, 0, 0},
                         {0, 9, 9, 0},
-                        {0, 0, 9, 0},
-                        {0, 0, 0, 0}
-
-        },
-        {
-                        {0, 0, 9, 0},
-                        {0, 9, 9, 9},
-                        {0, 0, 0, 0},
-                        {0, 0, 0, 0}
-
-        },
-        {
-                        {0, 0, 9, 0},
-                        {0, 0, 9, 9},
-                        {0, 0, 9, 0},
-                        {0, 0, 0, 0}
+                        {0, 9, 0, 0}
 
         },
 
 };
 
-//±‚∫ª «‘ºˆµÈ
+//Í∏∞Î≥∏ Ìï®ÏàòÎì§
 void gotoxy(short x, short y) { // Windows.h
     COORD pos{ x, y };
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
@@ -186,14 +250,14 @@ void CursorView(char show) {
     SetConsoleCursorInfo(hConsole, &ConsoleCursor);
 }
 
-//∏ﬁ¿Œ «‘ºˆµÈ
+//Î©îÏù∏ Ìï®ÏàòÎì§
 void draw_frame(int len_x, int len_y, int i_x, int i_y) {
     int pos[2] = { i_x, i_y };
-    len_x--; //∫∏¡§
+    len_x--; //Î≥¥Ï†ï
     for (int i = 0; i <= len_x; i++) {
         if (i % 2 == 0) {
             gotoxy(pos[0] + i, pos[1]);
-            cout << "¢Ã";
+            cout << "‚ñ©";
         }
         table_data[i][0] = 10;
     }
@@ -201,21 +265,21 @@ void draw_frame(int len_x, int len_y, int i_x, int i_y) {
     for (int i = 0; i <= len_x; i++) {
         if (i % 2 == 0) {
             gotoxy(pos[0] + i, pos[1] + len_y - 1);
-            cout << "¢Ã";
+            cout << "‚ñ©";
         }
         table_data[i][length_y - 1] = 10;
     }
 
     for (int i = 1; i < len_y - 1; i++) {
         gotoxy(pos[0], pos[1] + i);
-        cout << "¢Ã";
+        cout << "‚ñ©";
         table_data[0][i] = 10;
         table_data[1][i] = 10;
     }
 
     for (int i = 1; i < len_y - 1; i++) {
         gotoxy(pos[0] + len_x - 1, pos[1] + i);
-        cout << "¢Ã";
+        cout << "‚ñ©";
         table_data[length_x - 2][i] = 10;
         table_data[length_x - 1][i] = 10;
     }
@@ -241,19 +305,19 @@ void draw_gametable() {
             else if (table_data[fx][fy] == 9) {
                 if (fx % 2 == 0) {
                     gotoxy(fx + initial_x, fy + initial_y);
-                    cout << "°·";
+                    cout << "‚ñ†";
                 }
             }
             else if (table_data[fx][fy] == 8) {
                 if (fx % 2 == 0) {
                     gotoxy(fx + initial_x, fy + initial_y);
-                    cout << "¢√";
+                    cout << "‚ñ£";
                 }
             }
             else if (table_data[fx][fy] == -1) {
                 if (fx % 2 == 0) {
                     gotoxy(fx + initial_x, fy + initial_y);
-                    cout << "°‡";
+                    cout << "‚ñ°";
                 }
             }
         }
@@ -265,7 +329,7 @@ void print_gametable_data() {
         for (int j = 0; j < length_x; j++) {
             if (table_data[j][i] == 10) {
                 if (j % 2 == 0)
-                    cout << "¢Ã";
+                    cout << "‚ñ©";
 
             }
             else if (table_data[j][i] == -1) {
@@ -281,9 +345,8 @@ void print_gametable_data() {
 class Block
 {
 protected:
-
-public:
     int gy = initial_y;
+public:
 
     void set_block1() {
         for (int i = 0; i < 4; i++) {
@@ -330,8 +393,27 @@ public:
             }
         }
     }
+    void set_block6() {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 4; k++) {
+                    shape[i][j][k] = block6[i][j][k];
+                }
+            }
+        }
+    }
+    void set_block7() {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 4; k++) {
+                    shape[i][j][k] = block7[i][j][k];
+                }
+            }
+        }
+    }
 
     void print_block() {
+        print_ghost();
         if (can_print()) {
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
@@ -360,6 +442,18 @@ public:
         if (count == 0) return true;
         else return false;
     }
+    void Solid() {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (shape[rot][i][j] == 9) {
+                    table_data[x - initial_x + 2 * i][y - initial_y + j] = 8;
+                    table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 8;
+                }
+            }
+        }
+        if (can_hold == false) can_hold = true;
+    }
+
     bool ghost_can_print() {
         int count = 0;
         for (int fx = 0; fx < 4; fx++) {
@@ -399,12 +493,16 @@ public:
 
 
     }
-    void print_variables() {
-        gotoxy(0, 0);
-        cout << "(" << x << ", " << y << ")" << endl;
-        cout << "rotation = " << rot << endl;
-    }
 
+
+    void Up() {
+        rot = (rot + 2) % 4;
+        if (can_print() == false) {
+            if (rot == 0) rot = 2;
+            else if (rot == 1) rot = 3;
+            else rot -= 2;
+        }
+    }
     void Down() {
         y++;
         if (can_print() == false) y--;
@@ -431,6 +529,19 @@ public:
             rot = (rot + 1) % 4;
         }
     }
+    void Hold() {
+        int temp;
+        x = initial_x + (length_x / 2 - 4), y = initial_y + 1;
+        if (hold == -1) {
+            hold = block_next[re_next_count - 1];
+
+        }
+        else {
+            temp = hold;
+            hold = block_next[re_next_count - 1];
+            block_next[re_next_count] = temp;
+        }
+    }
     void SpaceBar() { //Hard Drop
         while (true) {
             y++;
@@ -442,52 +553,108 @@ public:
             }
         }
     }
-    void Solid() {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                if (shape[rot][i][j] == 9) {
-                    table_data[x - initial_x + 2 * i][y - initial_y + j] = 8;
-                    table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 8;
+
+
+    void next_block() {
+        if (re_next_count >= 7) {
+            re_next_count = 0;
+            for (int i = 0; i < 7; i++) {
+                block_next[i] = block_next[i + 7];
+            }
+        Re_second_bag:
+            for (int i = 7; i < 14; i++) {
+                block_next[i] = rand() % 7 + 1;
+            }
+            for (int i = 7; i < 14; i++) {
+                for (int j = 7; j < 14; j++) {
+                    if (i != j) {
+                        if (block_next[i] == block_next[j]) {
+                            goto Re_second_bag;
+                        }
+                    }
                 }
             }
         }
-    }
-    void next_block() {
-        int which_block = rand() % 5 + 1;
-        if (which_block == 1) set_block1();
-        else if (which_block == 2) set_block2();
-        else if (which_block == 3) set_block3();
-        else if (which_block == 4) set_block4();
-        else if (which_block == 5) set_block5();
-    }
-};
+        else if (re_next_count == -1) {
+            re_next_count = 0;
+        Re_first_bag:
+            for (int i = 0; i < 7; i++) {
+                block_next[i] = rand() % 7 + 1;
+            }
+            for (int i = 0; i < 7; i++) {
+                for (int j = 0; j < 7; j++) {
+                    if (i != j) {
+                        if (block_next[i] == block_next[j]) {
+                            goto Re_first_bag;
+                        }
+                    }
+                }
+            }
+            goto Re_second_bag;
+        }
 
+        if (block_next[re_next_count] == 1) set_block1();
+        else if (block_next[re_next_count] == 2) set_block2();
+        else if (block_next[re_next_count] == 3) set_block3();
+        else if (block_next[re_next_count] == 4) set_block4();
+        else if (block_next[re_next_count] == 5) set_block5();
+        else if (block_next[re_next_count] == 6) set_block6();
+        else if (block_next[re_next_count] == 7) set_block7();
+
+        re_next_count++;
+
+    }
+    void show_nexts_and_hold() {
+
+    }
+
+};
 class GamePlay : public Block
 {
+
 public:
     GamePlay() {
-        srand(time(NULL));
+        srand((unsigned int)time(NULL));
         Block block;
-        int key;
         bool next_block = false;
         rot = 0;
 
-        block.next_block();
-        block.print_block();
-        block.print_ghost();
+        draw_frame(length_x, length_y, initial_x, initial_y); // frame Í∑∏Î¶¨Í∏∞
+
+        block.next_block(); //Ï¥àÍ∏∞ Î∏îÎü≠, ÎÑ•Ïä§Ìä∏ Î∏îÎü≠ Í≤∞Ï†ï
+        block.print_block(); //Ï¥àÍ∏∞ Î∏îÎü≠ Îç∞Ïù¥ÌÑ∞ ÏûÖÎ†•
         draw_gametable();
+
         print_gametable_data(); //test
-        print_gametable_data(); //test
-        print_variables(); //test
-        gotoxy(x, y); //test
-        printf("°‹"); //test
-        while (true) //≈∞ ¿‘∑¬
+
+
+
+        clock_t start, end;
+        float time = 0;
+        start = clock();
+
+        while (true) //ÌÇ§ ÏûÖÎ†•
         {
+            int key;
+            end = clock();
+            time = ((float)(end - start) / CLOCKS_PER_SEC);
+            if (time >= 1) {
+                block.Down();
+                if (block.can_print()) {
+                    clear_gametable(); //clear
+                    block.print_block();
+                }
+                draw_gametable();
+                start = clock();
+            }
             if (_kbhit()) {
                 key = _getch();
                 if (key == 224) {
                     key = _getch();
                     switch (key) {
+                    case UP:
+                        block.Up();
+                        break;
                     case DOWN:
                         block.Down();
                         break;
@@ -501,16 +668,29 @@ public:
                         break;
                     }
                 }
-                else if (key == 90 || key == 122) { // Z or z
+                else if (key == 97 || key == 65) { // A or a 
+                    if (can_hold) {
+                        block.Hold();
+                        can_hold = false;
+                        next_block = true;
+                    }
+                    else continue;
+                }
+                else if (key == 90 || key == 122 || key == 115 || key == 83) { // Z or z or S or s
                     block.Rotate_Z();
                 }
-                else if (key == 88 || key == 120) { // X or x
+                else if (key == 88 || key == 120 || key == 100 || key == 68) { // X or x
                     block.Rotate_X();
                 }
                 else if (key == 32) { // SpaceBar 
                     block.SpaceBar();
                     next_block = true;
-                } //≈∞ ¿‘∑¬ ≥°
+                }
+                else if (key == 27) {
+                    //game_pause();
+                    break;
+                }
+                //ÌÇ§ ÏûÖÎ†• ÎÅù
 
 
 
@@ -518,13 +698,11 @@ public:
                     block.next_block();
                     clear_gametable();
                     x = initial_x + (length_x / 2 - 4), y = initial_y + 1;
-                    block.print_ghost();
                     block.print_block();
                     next_block = false;
                 }
                 else if (block.can_print()) {
                     clear_gametable(); //clear
-                    block.print_ghost();
                     block.print_block();
                 }
 
@@ -534,9 +712,18 @@ public:
 
 
                 print_gametable_data(); //test
+                gotoxy(0, 0);
+                for (int i = 0; i < 14; i++) {
+                    cout << block_next[i] << " ";
+                }
+                cout << endl;
+                cout << "hold = " << hold << "  " << endl;; //hold Ïò§Î•òÏûàÏùå
+                cout << "re_next_count = " << re_next_count << endl;
+                /*
                 print_variables(); //test
                 gotoxy(x, y); //test
-                printf("°‹"); //test
+                printf("‚óè"); //test
+                */
             }
         }
     }
@@ -545,12 +732,17 @@ public:
 int main()
 {
     CursorView(false);
-    draw_frame(length_x, length_y, initial_x, initial_y);
     GamePlay();
+
 
     gotoxy(0, 30);
 }
 
-// ∞ÀªÁ
+// Í≤ÄÏÇ¨
+
+
+
+
+
 
 
