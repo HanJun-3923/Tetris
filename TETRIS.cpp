@@ -15,22 +15,22 @@ using namespace std;
 #define hold_ini_x 10
 #define hold_ini_y 6
 
-#define LEFT 75 // ¡ç
-#define RIGHT 77  // ¡æ
-#define UP 72 // ¡è
-#define DOWN 80 // ¡é
+#define LEFT 75 // â†
+#define RIGHT 77  // â†’
+#define UP 72 // â†‘
+#define DOWN 80 // â†“
 
-//¡à ¡á ¡Û ¡Ü ¢Ì ¢Ç ¢È ¢É ¢Ê ¢Ë ¢Ã ¢Á
-/* table_data ¹øÈ£ ÀÇ¹Ì
+//â–¡ â–  â—‹ â— â–© â–¤ â–¥ â–¨ â–§ â–¦ â–£ âŠ™
+/* table_data ë²ˆí˜¸ ì˜ë¯¸
 0 = " "
-1 ~ 7 -> o i s z l j t  /// color + ¡á
-11 ~ 17 -> solid(0, i, s, z, l, j, t)  /// color + ¢Ã
-10 = wall  ///¢Ì
--2 = ghost wall //¢Ì
--1 = "ghost"  /// ¡à (no color)
+1 ~ 7 -> o i s z l j t  /// color + â– 
+11 ~ 17 -> solid(0, i, s, z, l, j, t)  /// color + â–£
+10 = wall  ///â–©
+-2 = ghost wall //â–©
+-1 = "ghost"  /// â–¡ (no color)
 */
 
-//block: O I S Z L J T ¼ø¼­
+//block: O I S Z L J T ìˆœì„œ
 const int block1[4][4][4] = {
 		{
 						{0, 0, 0, 0},
@@ -236,7 +236,7 @@ const int block7[4][4][4] = {
 
 };
 
-//±âº» ÇÔ¼öµé
+//ê¸°ë³¸ í•¨ìˆ˜ë“¤
 void gotoxy(short x, short y) { // Windows.h
 	COORD pos{ x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
@@ -257,7 +257,7 @@ void setcolor(int color)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
-//¸ŞÀÎ ÇÔ¼öµé
+//ë©”ì¸ í•¨ìˆ˜ë“¤
 void Main_Menu()
 {
 	int num;
@@ -704,7 +704,7 @@ protected:
 			else if (hold == 6) set_block6(3);
 			else if (hold == 7) set_block7(3);
 		}
-		for (int i = 0; i < 8; i++) { //ÃÊ±âÈ­
+		for (int i = 0; i < 8; i++) { //ì´ˆê¸°í™”
 			for (int j = 0; j < 4; j++) {
 				hold_data[i][j] = 0;
 			}
@@ -881,11 +881,11 @@ public:
 	//draw_console
 	void draw_console_basic_frame(int len_x, int len_y, int i_x, int i_y) {
 		int pos[2] = { i_x, i_y };
-		len_x--; //º¸Á¤ 
+		len_x--; //ë³´ì • 
 		for (int i = 0; i <= len_x; i++) {
 			if (i % 2 == 0) {
 				gotoxy(pos[0] + i, pos[1]);
-				cout << "¢Ì";
+				cout << "â–©";
 			}
 			table_data[i][0] = -2;
 		}
@@ -893,21 +893,21 @@ public:
 		for (int i = 0; i <= len_x; i++) {
 			if (i % 2 == 0) {
 				gotoxy(pos[0] + i, pos[1] + len_y - 1);
-				cout << "¢Ì";
+				cout << "â–©";
 			}
 			table_data[i][length_y - 1] = 10;
 		}
 
 		for (int i = 1; i < len_y - 1; i++) {
 			gotoxy(pos[0], pos[1] + i);
-			cout << "¢Ì";
+			cout << "â–©";
 			table_data[0][i] = 10;
 			table_data[1][i] = 10;
 		}
 
 		for (int i = 1; i < len_y - 1; i++) {
 			gotoxy(pos[0] + len_x - 1, pos[1] + i);
-			cout << "¢Ì";
+			cout << "â–©";
 			table_data[length_x - 2][i] = 10;
 			table_data[length_x - 1][i] = 10;
 		}
@@ -942,7 +942,7 @@ public:
 					}
 					if (fx % 2 == 0) {
 						gotoxy(fx + initial_x, fy + initial_y);
-						cout << "¡á";
+						cout << "â– ";
 					}
 					setcolor(15);
 
@@ -973,7 +973,7 @@ public:
 					}
 					if (fx % 2 == 0) {
 						gotoxy(fx + initial_x, fy + initial_y);
-						cout << "¢Ã";
+						cout << "â–£";
 					}
 					setcolor(15);
 				}
@@ -981,13 +981,13 @@ public:
 					//no color
 					if (fx % 2 == 0) {
 						gotoxy(fx + initial_x, fy + initial_y);
-						cout << "¡à";
+						cout << "â–¡";
 					}
 				}
 				else if (table_data[fx][fy] == -2) {
 					if (fx % 2 == 0) {
 						gotoxy(fx + initial_x, fy + initial_y);
-						cout << "¢Ì";
+						cout << "â–©";
 					}
 				}
 			}
@@ -1021,7 +1021,7 @@ public:
 					}
 					if (i % 2 == 0) {
 						gotoxy(hold_ini_x + i, hold_ini_y + j);
-						cout << "¡á";
+						cout << "â– ";
 					}
 					setcolor(15);
 				}
@@ -1037,7 +1037,7 @@ public:
 			for (int j = 0; j < length_x + len_next_x; j++) {
 				if (table_data[j][i] == 10) {
 					if (j % 2 == 0)
-						cout << "¢Ì";
+						cout << "â–©";
 
 				}
 				else if (table_data[j][i] < 0) {
@@ -1074,13 +1074,13 @@ public:
 		srand((unsigned int)time(NULL));
 		bool next_block = false;
 		bool bool_Auto_Down = false;
-
+		
 
 		Main_Menu();
 
-		draw_console_basic_frame(length_x, length_y, initial_x, initial_y); // frame ±×¸®±â
-		set_order_next_block(); //ÃÊ±â ºí·°, ³Ø½ºÆ® ºí·° °áÁ¤
-		set_data_block(); //ÃÊ±â ºí·° µ¥ÀÌÅÍ ÀÔ·Â
+		draw_console_basic_frame(length_x, length_y, initial_x, initial_y); // frame ê·¸ë¦¬ê¸°
+		set_order_next_block(); //ì´ˆê¸° ë¸”ëŸ­, ë„¥ìŠ¤íŠ¸ ë¸”ëŸ­ ê²°ì •
+		set_data_block(); //ì´ˆê¸° ë¸”ëŸ­ ë°ì´í„° ì…ë ¥
 		set_data_next_block();
 		draw_console_gametable();
 		can_hold = true;
@@ -1091,7 +1091,7 @@ public:
 		float Auto_Down_Time = 0;
 		Auto_Down_Start = clock();
 
-		while (true) //Å° ÀÔ·Â
+		while (true) //í‚¤ ì…ë ¥
 		{
 			int key;
 			Auto_Down_End = clock();
@@ -1151,7 +1151,7 @@ public:
 						break;
 					}
 				}
-				//Å° ÀÔ·Â ³¡
+				//í‚¤ ì…ë ¥ ë
 
 
 				if (GameOver()) {
@@ -1189,7 +1189,7 @@ public:
 
 int main()
 {
-	system("mode con cols=120 lines=30 | title TETRIS"); // ÄÜ¼ÖÃ¢ Å©±â ¹× Á¦¸ñ ¼³Á¤
+	system("mode con cols=120 lines=30 | title TETRIS"); // ì½˜ì†”ì°½ í¬ê¸° ë° ì œëª© ì„¤ì •
 	CursorView(false);
 	Game Tetris;
 	Tetris.GameStart();
