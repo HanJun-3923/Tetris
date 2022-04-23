@@ -15,22 +15,23 @@ using namespace std;
 #define hold_ini_x 10
 #define hold_ini_y 6
 
-#define LEFT 75 // ‚Üê
-#define RIGHT 77  // ‚Üí
-#define UP 72 // ‚Üë
-#define DOWN 80 // ‚Üì
+#define LEFT 75 // °Á
+#define RIGHT 77  // °Ê
+#define UP 72 // °Ë
+#define DOWN 80 // °È
 
-//‚ñ° ‚ñ† ‚óã ‚óè ‚ñ© ‚ñ§ ‚ñ• ‚ñ® ‚ñß ‚ñ¶ ‚ñ£ ‚äô
-/* table_data Î≤àÌò∏ ÏùòÎØ∏
+
+//°‡ °· °€ °‹ ¢Ã ¢« ¢» ¢… ¢  ¢À ¢√ ¢¡
+/* table_data π¯»£ ¿«πÃ
 0 = " "
-1 ~ 7 -> o i s z l j t  /// color + ‚ñ†
-11 ~ 17 -> solid(0, i, s, z, l, j, t)  /// color + ‚ñ£
-10 = wall  ///‚ñ©
--2 = ghost wall //‚ñ©
--1 = "ghost"  /// ‚ñ° (no color)
+1 ~ 7 -> o i s z l j t  /// color + °·
+11 ~ 17 -> solid(0, i, s, z, l, j, t)  /// color + ¢√
+10 = wall  ///¢Ã
+-2 = ghost wall //¢Ã
+-1 = "ghost"  /// °‡ (no color)
 */
 
-//block: O I S Z L J T ÏàúÏÑú
+//block: O I S Z L J T º¯º≠
 const int block1[4][4][4] = {
 		{
 						{0, 0, 0, 0},
@@ -236,7 +237,21 @@ const int block7[4][4][4] = {
 
 };
 
-//Í∏∞Î≥∏ Ìï®ÏàòÎì§
+enum SYSTEM_CONDITION
+{
+	SYSTEM_OK = 1,
+	SYSTEM_PAUSE = 0,
+	SYSTEM_ERROR = -1
+};
+
+enum TIME {
+	TIME_START = 1,
+	TIME_RESTART = 0,
+	TIME_STOP = -1,
+	TIME_RESET = -2
+};
+
+//±‚∫ª «‘ºˆµÈ
 void gotoxy(short x, short y) { // Windows.h
 	COORD pos{ x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
@@ -254,26 +269,121 @@ void CursorView(char show) {
 }
 void setcolor(int color)
 {
+	/*
+	14 -> OπÃ≥Î
+	11 -> IπÃ≥Î
+	10 -> SπÃ≥Î
+	4 -> ZπÃ≥Î
+	12 -> LπÃ≥Î
+	1 -> J πÃ≥Î
+	13 -> TπÃ≥Î
+	*/
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
-//Î©îÏù∏ Ìï®ÏàòÎì§
-void Main_Menu()
+class Main_Menu
 {
-	int num;
-	system("cls");
+private:
+	const int Number_of_SubMenu = 3;
+	int pointer = 1;
 
-	cout << "\t\t"; cout << "                  ";
-	num = _getch();
-	system("cls");
-}
+public:
+	void Start_Main_Menu() {
+		int key;
+
+		setcolor(15);
+		draw_console_Menu(); // TETRIS πÆ±∏ ∂ÁøÏ±‚
+		Show_SubMenu(); // º≠∫Í ∏ﬁ¥∫ ∂ÁøÏ±‚
+
+		while (true) {
+			if (_kbhit()) {
+				key = _getch();
+				if (key == 224) {
+					key = _getch();
+					switch (key) {
+					case UP:
+						pointer -= 1;
+						if (pointer < 0) pointer += (Number_of_SubMenu + 1);
+						break;
+					case DOWN:
+						pointer += 1;
+						if (pointer > Number_of_SubMenu) pointer -= (Number_of_SubMenu + 1);
+						break;
+					}
+				}
+				else if (key == 32 || key == 13) { //Space_Bar or Enter
+					break;
+				}
+				Show_SubMenu();
+			}
+		}
+		Get_Menu();
+	}
+	void draw_console_Menu()
+	{// 10 20 1 20 10
+		gotoxy(0, 1);
+		cout << endl << endl << endl;
+		cout << "\t" << "          ¢√¢√¢√¢√¢√¢√¢√  ¢√¢√¢√¢√¢√¢√  ¢√¢√¢√¢√¢√¢√¢√  ¢√¢√¢√¢√¢√    ¢√¢√¢√    ¢√¢√¢√¢√¢√¢√      " << endl;
+		cout << "\t" << "                ¢√        ¢√                  ¢√        ¢√      ¢√      ¢√      ¢√                " << endl;
+		cout << "\t" << "                ¢√        ¢√                  ¢√        ¢√      ¢√      ¢√      ¢√                " << endl;
+		cout << "\t" << "                ¢√        ¢√¢√¢√¢√¢√¢√        ¢√        ¢√    ¢√        ¢√      ¢√¢√¢√¢√¢√¢√      " << endl;
+		cout << "\t" << "                ¢√        ¢√                  ¢√        ¢√¢√¢√          ¢√                ¢√      " << endl;
+		cout << "\t" << "                ¢√        ¢√                  ¢√        ¢√    ¢√        ¢√                ¢√      " << endl;
+		cout << "\t" << "                ¢√        ¢√¢√¢√¢√¢√¢√        ¢√        ¢√      ¢√    ¢√¢√¢√    ¢√¢√¢√¢√¢√¢√      " << endl;
+	}
+	void Get_Menu() {
+		switch (pointer) {
+		case 1: // > ∞‘¿” Ω√¿€ <
+			setcolor(15);
+			break;
+		case 2: // > ∞‘¿” º≥∏Ì <
+			Game_Explanation();
+			break;
+		case 3: // > ∞‘¿” ¡æ∑· <
+			break;
+
+		}
+	}
+	void Game_Explanation() {
+
+
+
+		// ---
+
+	}
+	void Show_SubMenu() {
+		if (pointer == 1) {
+			gotoxy(52, 17);
+			cout << "> ∞‘¿” Ω√¿€ <" << endl;
+		}
+		else {
+			gotoxy(52, 17);
+			cout << "  ∞‘¿” Ω√¿€  " << endl;
+		}
+		if (pointer == 2) {
+			gotoxy(52, 19);
+			cout << "> ∞‘¿” º≥∏Ì <" << endl;
+		}
+		else {
+			gotoxy(52, 19);
+			cout << "  ∞‘¿” º≥∏Ì  " << endl;
+		}
+		if (pointer == 3) {
+			gotoxy(52, 21);
+			cout << "> ∞‘¿” ¡æ∑· <" << endl;
+		}
+		else {
+			gotoxy(52, 21);
+			cout << "  ∞‘¿” ¡æ∑·  " << endl;
+		}
+
+	}
+};
+
 //clear_console
 class Block
 {
-protected:
-	int table_data[length_x + len_next_x][length_y] = { };
-	int hold_data[8][4] = { };
-	int x = initial_x + (length_x / 2 - 4), y = initial_y;
+private:
 	int block_next[14] = { }; // 7 blocks(1 bag) x 2
 	int ghost_y = initial_y;
 	int next_shape[4][4][4] = { };
@@ -282,6 +392,11 @@ protected:
 	int rot = 0; //rotation
 	int hold = -1;
 	int re_next_count = -1;
+
+protected:
+	int table_data[length_x + len_next_x][length_y] = { };
+	int hold_data[8][4] = { };
+	int x = initial_x + (length_x / 2 - 4), y = initial_y;
 	bool can_hold = true;
 	/*
 	int rot = 0; //rotation
@@ -292,7 +407,6 @@ protected:
 	int re_next_count = -1;
 	bool can_hold = true;
 	*/
-
 	void set_block1(int n) {
 		if (n == 1) {
 			for (int i = 0; i < 4; i++) {
@@ -574,22 +688,6 @@ protected:
 	}
 
 	//sold -> delete line
-	void Solid() {
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				if (1 <= block_shape[rot][i][j] && block_shape[rot][i][j] <= 7) {
-					if (is_overlapped_ghost_wall(i, j)) {
-						table_data[x - initial_x + 2 * i][y - initial_y + j] = 10 + block_shape[rot][i][j];
-						table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 10 + block_shape[rot][i][j];
-					}
-				}
-			}
-		}
-		if (can_hold == false) can_hold = true;
-		rot = 0;
-		//set_nexts_and_hold();
-		delete_line();
-	}
 
 	bool can_ghost_move() {
 		int count = 0;
@@ -704,7 +802,7 @@ protected:
 			else if (hold == 6) set_block6(3);
 			else if (hold == 7) set_block7(3);
 		}
-		for (int i = 0; i < 8; i++) { //Ï¥àÍ∏∞Ìôî
+		for (int i = 0; i < 8; i++) { //√ ±‚»≠
 			for (int j = 0; j < 4; j++) {
 				hold_data[i][j] = 0;
 			}
@@ -717,7 +815,7 @@ protected:
 		}
 	}
 
-	//SpaceBar -> Solid
+	//SpaceBar -> Solid -> delete line
 	void Hard_Drop() { //Hard Drop
 		while (true) {
 			y++;
@@ -727,6 +825,45 @@ protected:
 				Solid();
 				break;
 			}
+		}
+	}
+	void Solid() {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				if (1 <= block_shape[rot][i][j] && block_shape[rot][i][j] <= 7) {
+					if (is_overlapped_ghost_wall(i, j)) {
+						table_data[x - initial_x + 2 * i][y - initial_y + j] = 10 + block_shape[rot][i][j];
+						table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 10 + block_shape[rot][i][j];
+					}
+				}
+			}
+		}
+		if (can_hold == false) can_hold = true;
+		rot = 0;
+		//set_nexts_and_hold();
+		delete_line();
+	}
+	void delete_line() {
+		int count = 0;
+		for (int j = 0; j < length_y; j++) {
+			for (int i = 0; i < length_x; i++) {
+				if (i % 2 == 0) {
+					if (11 <= table_data[i][j] && table_data[i][j] <= 17) {
+						count++;
+					}
+				}
+			}
+			if (count >= length_x / 2 - 2) { //delete line
+				for (int fy = j; fy > 1; fy--) {
+					for (int fx = 0; fx < length_x; fx++) {
+						table_data[fx][fy] = table_data[fx][fy - 1];
+					}
+				}
+				count = 0;
+				j--;
+			}
+			else count = 0;
+
 		}
 	}
 
@@ -806,27 +943,15 @@ protected:
 		}
 	}
 
-	void delete_line() {
-		int count = 0;
-		for (int j = 0; j < length_y; j++) {
-			for (int i = 0; i < length_x; i++) {
-				if (i % 2 == 0) {
-					if (11 <= table_data[i][j] && table_data[i][j] <= 17) {
-						count++;
-					}
-				}
-			}
-			if (count >= length_x / 2 - 2) { //delete line
-				for (int fy = j; fy > 1; fy--) {
-					for (int fx = 0; fx < length_x; fx++) {
-						table_data[fx][fy] = table_data[fx][fy - 1];
-					}
-				}
-				count = 0;
-				j--;
-			}
-			else count = 0;
-
+	bool is_block_on_ground() {
+		y++;
+		if (can_block_move()) {
+			y--;
+			return false;
+		}
+		else {
+			y--;
+			return true;
 		}
 	}
 
@@ -881,11 +1006,11 @@ public:
 	//draw_console
 	void draw_console_basic_frame(int len_x, int len_y, int i_x, int i_y) {
 		int pos[2] = { i_x, i_y };
-		len_x--; //Î≥¥Ï†ï 
+		len_x--; //∫∏¡§ 
 		for (int i = 0; i <= len_x; i++) {
 			if (i % 2 == 0) {
 				gotoxy(pos[0] + i, pos[1]);
-				cout << "‚ñ©";
+				cout << "¢Ã";
 			}
 			table_data[i][0] = -2;
 		}
@@ -893,21 +1018,21 @@ public:
 		for (int i = 0; i <= len_x; i++) {
 			if (i % 2 == 0) {
 				gotoxy(pos[0] + i, pos[1] + len_y - 1);
-				cout << "‚ñ©";
+				cout << "¢Ã";
 			}
 			table_data[i][length_y - 1] = 10;
 		}
 
 		for (int i = 1; i < len_y - 1; i++) {
 			gotoxy(pos[0], pos[1] + i);
-			cout << "‚ñ©";
+			cout << "¢Ã";
 			table_data[0][i] = 10;
 			table_data[1][i] = 10;
 		}
 
 		for (int i = 1; i < len_y - 1; i++) {
 			gotoxy(pos[0] + len_x - 1, pos[1] + i);
-			cout << "‚ñ©";
+			cout << "¢Ã";
 			table_data[length_x - 2][i] = 10;
 			table_data[length_x - 1][i] = 10;
 		}
@@ -942,7 +1067,7 @@ public:
 					}
 					if (fx % 2 == 0) {
 						gotoxy(fx + initial_x, fy + initial_y);
-						cout << "‚ñ†";
+						cout << "°·";
 					}
 					setcolor(15);
 
@@ -973,7 +1098,7 @@ public:
 					}
 					if (fx % 2 == 0) {
 						gotoxy(fx + initial_x, fy + initial_y);
-						cout << "‚ñ£";
+						cout << "¢√";
 					}
 					setcolor(15);
 				}
@@ -981,13 +1106,13 @@ public:
 					//no color
 					if (fx % 2 == 0) {
 						gotoxy(fx + initial_x, fy + initial_y);
-						cout << "‚ñ°";
+						cout << "°‡";
 					}
 				}
 				else if (table_data[fx][fy] == -2) {
 					if (fx % 2 == 0) {
 						gotoxy(fx + initial_x, fy + initial_y);
-						cout << "‚ñ©";
+						cout << "¢Ã";
 					}
 				}
 			}
@@ -1021,7 +1146,7 @@ public:
 					}
 					if (i % 2 == 0) {
 						gotoxy(hold_ini_x + i, hold_ini_y + j);
-						cout << "‚ñ†";
+						cout << "°·";
 					}
 					setcolor(15);
 				}
@@ -1037,7 +1162,7 @@ public:
 			for (int j = 0; j < length_x + len_next_x; j++) {
 				if (table_data[j][i] == 10) {
 					if (j % 2 == 0)
-						cout << "‚ñ©";
+						cout << "¢Ã";
 
 				}
 				else if (table_data[j][i] < 0) {
@@ -1068,46 +1193,76 @@ public:
 
 class Game : public Console
 {
+private:
+	bool next_block = false;
+	bool bool_Auto_Down = false;
+	bool counting_on_ground = false;
+
+	clock_t Auto_Down_Start = 0, Auto_Down_End = 0;
+	float Auto_Down_Time = 0;
+	float Temp_Time_Auto_Down = 0;
+
+	clock_t On_Ground_Start = 0, On_Ground_End = 0;
+	float On_Ground_Time = 0;
+	float Temp_Time_On_Ground = 0;
 
 public:
 	void GameStart() {
 		srand((unsigned int)time(NULL));
-		bool next_block = false;
-		bool bool_Auto_Down = false;
-		
 
-		Main_Menu();
+		Main_Menu Tetris_Menu;
+		Tetris_Menu.Start_Main_Menu();
+		system("cls");
 
-		draw_console_basic_frame(length_x, length_y, initial_x, initial_y); // frame Í∑∏Î¶¨Í∏∞
-		set_order_next_block(); //Ï¥àÍ∏∞ Î∏îÎü≠, ÎÑ•Ïä§Ìä∏ Î∏îÎü≠ Í≤∞Ï†ï
-		set_data_block(); //Ï¥àÍ∏∞ Î∏îÎü≠ Îç∞Ïù¥ÌÑ∞ ÏûÖÎ†•
-		set_data_next_block();
-		draw_console_gametable();
-		can_hold = true;
+		draw_console_basic_frame(length_x, length_y, initial_x, initial_y); // frame ±◊∏Æ±‚
+		set_order_next_block(); //√ ±‚ ∫Ì∑∞, ≥ÿΩ∫∆Æ ∫Ì∑∞ ∞·¡§
+		set_data_block(); //√ ±‚ ∫Ì∑∞ µ•¿Ã≈Õ ¿‘∑¬
+		set_data_next_block(); // ≥ÿΩ∫∆Æ ∫Ì∑∞ µ•¿Ã≈Õ ¿‘∑¬
+		draw_console_gametable(); // ¿‘∑¬µ» µ•¿Ã≈Õ∏¶ √‚∑¬
 
-		//print_gametable_data(); //test
-
-		clock_t Auto_Down_Start, Auto_Down_End;
-		float Auto_Down_Time = 0;
 		Auto_Down_Start = clock();
-
-		while (true) //ÌÇ§ ÏûÖÎ†•
+		while (true) //≈∞ ¿‘∑¬
 		{
 			int key;
 			Auto_Down_End = clock();
-			Auto_Down_Time = ((float)(Auto_Down_End - Auto_Down_Start) / CLOCKS_PER_SEC);
-			if (Auto_Down_Time >= 1) {
+			if (counting_on_ground) On_Ground_End = clock();
+
+			Auto_Down_Time = ((float)(Auto_Down_End - Auto_Down_Start) / CLOCKS_PER_SEC) + Temp_Time_Auto_Down;
+			if (counting_on_ground) On_Ground_Time = ((float)(On_Ground_End - On_Ground_Start) / CLOCKS_PER_SEC) + Temp_Time_On_Ground;
+
+			if (Auto_Down_Time >= 1) { // DOWN or SOLID
 				y++;
 				bool_Auto_Down = true;
 				if (can_block_move()) {
 					set_data_block();
-					Auto_Down_Start = clock();
+					Auto_Down(TIME_START);
 				}
 				else {
 					y--;
 					Solid();
 					next_block = true;
+					Auto_Down(TIME_START);
 				}
+			}
+			if (is_block_on_ground()) { // On_Ground √¯¡§
+				if (counting_on_ground == false) { // √¯¡§ ¡ﬂ¿Ã æ∆¥œø¥≥™∏È √¯¡§ Ω√¿€
+					On_Ground(TIME_RESTART);
+					counting_on_ground = true;
+				}
+			}
+			else { // On_Ground æ∆¥œ∏È
+				if (counting_on_ground == true) { // √¯¡§ ¡ﬂ¥‹
+					On_Ground(TIME_STOP);
+					counting_on_ground = false;
+				}
+			}
+			if (On_Ground_Time >= 3 && is_block_on_ground()) { //º“«¡∆Æ µÂ∂¯¿∏∑Œ Solid∞° æ»µ«∞‘ «œ¥¬ ø¿∑˘ ºˆ¡§
+				Solid();
+				next_block = true;
+				bool_Auto_Down = true;
+				counting_on_ground = false;
+				Auto_Down(TIME_RESTART);
+				On_Ground(TIME_RESET);
 			}
 			if (_kbhit() || bool_Auto_Down) {
 				if (_kbhit()) {
@@ -1119,13 +1274,18 @@ public:
 							Move(UP);
 							break;
 						case DOWN:
+							Auto_Down_Time = 0;
 							Auto_Down_Start = clock();
 							Move(DOWN);
 							break;
 						case LEFT:
+							Auto_Down_Time = 0;
+							Auto_Down_Start = clock();
 							Move(LEFT);
 							break;
 						case RIGHT:
+							Auto_Down_Time = 0;
+							Auto_Down_Start = clock();
 							Move(RIGHT);
 							break;
 						}
@@ -1151,7 +1311,7 @@ public:
 						break;
 					}
 				}
-				//ÌÇ§ ÏûÖÎ†• ÎÅù
+				//≈∞ ¿‘∑¬ ≥°
 
 
 				if (GameOver()) {
@@ -1159,37 +1319,73 @@ public:
 					break;
 				}
 				if (next_block) {
-					set_order_next_block();
-					clear_console_gametable();
-					clear_console_next_block();
-					x = initial_x + (length_x / 2 - 4), y = initial_y;
-					set_data_block();
-					set_data_next_block();
+					set_order_next_block(); // next ∞ªΩ≈
+					clear_console_gametable();  // ƒ‹º÷ ¡ˆøÏ±‚
+					clear_console_next_block(); // ƒ‹º÷ ¡ˆøÏ±‚
+					x = initial_x + (length_x / 2 - 4), y = initial_y; // ¿ßƒ° √ ±‚»≠
+					set_data_block(); // ∫Ì∑œ µ•¿Ã≈Õ ¿‘∑¬
+					set_data_next_block(); // ≥ÿΩ∫∆Æ µ•¿Ã≈Õ ¿‘∑¬
 					next_block = false;
+					On_Ground(TIME_RESET);
 				}
 				else if (can_block_move()) {
 					clear_console_gametable(); //clear
-					set_data_block();
+					set_data_block(); // ∫Ì∑œ µ•¿Ã≈Õ ¿‘∑¬
 				}
 
 				bool_Auto_Down = false;
 				//draw_frame(length_x, length_y, initial_x, initial_y);
 				draw_console_gametable(); // gametable Reload!!
 
-				gotoxy(0, 0);
-				cout << hold << "  " << endl;
-				cout << rot << "    " << endl;
-				printf("%d\n", rot);
 				print_gametable_data(); //test
 
 			}
 		}
 	}
+	void Auto_Down(int CONDITION) {
+		if (CONDITION == TIME_START) {
+			Auto_Down_Start = clock();
+		}
+		else if (CONDITION == TIME_RESTART) {
+			Auto_Down_Start = clock();
+		}
+		else if (CONDITION == TIME_STOP) {
+			Auto_Down_End = clock();
+			Auto_Down_Time = ((float)(Auto_Down_End - Auto_Down_Start) / CLOCKS_PER_SEC) + Temp_Time_Auto_Down;
+			Temp_Time_Auto_Down = Auto_Down_Time;
+
+		}
+		else if (CONDITION == TIME_RESET) {
+			Auto_Down_Time = 0;
+			Temp_Time_Auto_Down = 0;
+			Auto_Down_Start = clock();
+		}
+	}
+	void On_Ground(int CONDITION) {
+		if (CONDITION == TIME_START) {
+			On_Ground_Start = clock();
+		}
+		else if (CONDITION == TIME_RESTART) {
+			On_Ground_Start = clock();
+		}
+		else if (CONDITION == TIME_STOP) {
+			On_Ground_End = clock();
+			On_Ground_Time = ((float)(On_Ground_End - On_Ground_Start) / CLOCKS_PER_SEC) + Temp_Time_On_Ground;
+			Temp_Time_On_Ground = On_Ground_Time;
+
+		}
+		else if (CONDITION == TIME_RESET) {
+			On_Ground_Time = 0;
+			Temp_Time_On_Ground = 0;
+			On_Ground_Start = clock();
+		}
+	}
+
 };
 
 int main()
 {
-	system("mode con cols=120 lines=30 | title TETRIS"); // ÏΩòÏÜîÏ∞Ω ÌÅ¨Í∏∞ Î∞è Ï†úÎ™© ÏÑ§Ï†ï
+	system("mode con cols=120 lines=30 | title TETRIS"); // ƒ‹º÷√¢ ≈©±‚ π◊ ¡¶∏Ò º≥¡§
 	CursorView(false);
 	Game Tetris;
 	Tetris.GameStart();
