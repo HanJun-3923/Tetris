@@ -67,11 +67,10 @@ const int block2[4][4][4] = {
 						{0, 0, 0, 0}
 		},
 		{
-						{0, 2, 0, 0},
-						{0, 2, 0, 0},
-						{0, 2, 0, 0},
-						{0, 2, 0, 0}
-
+						{0, 0, 2, 0},
+						{0, 0, 2, 0},
+						{0, 0, 2, 0},
+						{0, 0, 2, 0}
 		},
 		{
 						{0, 0, 0, 0},
@@ -81,10 +80,11 @@ const int block2[4][4][4] = {
 
 		},
 		{
-						{0, 0, 2, 0},
-						{0, 0, 2, 0},
-						{0, 0, 2, 0},
-						{0, 0, 2, 0}
+						{0, 2, 0, 0},
+						{0, 2, 0, 0},
+						{0, 2, 0, 0},
+						{0, 2, 0, 0}
+
 		},
 
 };
@@ -97,23 +97,23 @@ const int block3[4][4][4] = {
 
 		},
 		{
-						{3, 0, 0, 0},
-						{3, 3, 0, 0},
+						{0, 0, 0, 0},
 						{0, 3, 0, 0},
-						{0, 0, 0, 0}
+						{0, 3, 3, 0},
+						{0, 0, 3, 0}
 		},
 		{
 						{0, 0, 0, 0},
+						{0, 0, 0, 0},
 						{0, 3, 3, 0},
-						{3, 3, 0, 0},
-						{0, 0, 0, 0}
+						{3, 3, 0, 0}
 
 		},
 		{
-						{0, 3, 0, 0},
-						{0, 3, 3, 0},
-						{0, 0, 3, 0},
-						{0, 0, 0, 0}
+						{0, 0, 0, 0},
+						{3, 0, 0, 0},
+						{3, 3, 0, 0},
+						{0, 3, 0, 0}
 		},
 
 };
@@ -127,9 +127,9 @@ const int block4[4][4][4] = {
 		},
 		{
 						{0, 0, 0, 0},
-						{0, 4, 0, 0},
-						{4, 4, 0, 0},
-						{4, 0, 0, 0}
+						{0, 0, 4, 0},
+						{0, 4, 4, 0},
+						{0, 4, 0, 0}
 		},
 		{
 						{0, 0, 0, 0},
@@ -140,9 +140,9 @@ const int block4[4][4][4] = {
 		},
 		{
 						{0, 0, 0, 0},
-						{0, 0, 4, 0},
-						{0, 4, 4, 0},
-						{0, 4, 0, 0}
+						{0, 4, 0, 0},
+						{4, 4, 0, 0},
+						{4, 0, 0, 0}
 		},
 
 };
@@ -156,10 +156,9 @@ const int block5[4][4][4] = {
 		},
 		{
 						{0, 0, 0, 0},
-						{5, 5, 0, 0},
 						{0, 5, 0, 0},
-						{0, 5, 0, 0}
-
+						{0, 5, 0, 0},
+						{0, 5, 5, 0}
 		},
 		{
 						{0, 0, 0, 0},
@@ -170,9 +169,10 @@ const int block5[4][4][4] = {
 		},
 		{
 						{0, 0, 0, 0},
+						{5, 5, 0, 0},
 						{0, 5, 0, 0},
-						{0, 5, 0, 0},
-						{0, 5, 5, 0}
+						{0, 5, 0, 0}
+
 		},
 
 };
@@ -185,9 +185,9 @@ const int block6[4][4][4] = {
 		},
 		{
 						{0, 0, 0, 0},
+						{0, 6, 6, 0},
 						{0, 6, 0, 0},
-						{0, 6, 0, 0},
-						{6, 6, 0, 0}
+						{0, 6, 0, 0}
 
 		},
 		{
@@ -199,9 +199,9 @@ const int block6[4][4][4] = {
 		},
 		{
 						{0, 0, 0, 0},
-						{0, 6, 6, 0},
 						{0, 6, 0, 0},
-						{0, 6, 0, 0}
+						{0, 6, 0, 0},
+						{6, 6, 0, 0}
 
 		},
 
@@ -216,7 +216,7 @@ const int block7[4][4][4] = {
 		{
 						{0, 0, 0, 0},
 						{0, 7, 0, 0},
-						{7, 7, 0, 0},
+						{0, 7, 7, 0},
 						{0, 7, 0, 0}
 
 		},
@@ -230,7 +230,7 @@ const int block7[4][4][4] = {
 		{
 						{0, 0, 0, 0},
 						{0, 7, 0, 0},
-						{0, 7, 7, 0},
+						{7, 7, 0, 0},
 						{0, 7, 0, 0}
 
 		},
@@ -239,18 +239,29 @@ const int block7[4][4][4] = {
 
 enum SYSTEM_CONDITION
 {
-	SYSTEM_OK = 1,
-	SYSTEM_PAUSE = 0,
-	SYSTEM_ERROR = -1
+	SYSTEM_OK,
+	SYSTEM_PAUSE,
+	SYSTEM_ERROR
 };
-
 enum TIME {
-	TIME_START = 1,
-	TIME_RESTART = 0,
-	TIME_STOP = -1,
-	TIME_RESET = -2
+	TIME_START,
+	TIME_RESTART,
+	TIME_STOP,
+	TIME_RESET
 };
-
+enum BLOCK_STATE {
+	DROP,
+	T_SPIN,
+	TETRIS = 4,
+	THREE_LINE_CLEAR = 3,
+	TWO_LINE_CLEAR = 2,
+	ONE_LINE_CLEAR = 1,
+	BACK_TO_BACK
+};
+enum PLUS_MINUS {
+	PLUS = 1,
+	MINUS = 0
+};
 //기본 함수들
 void gotoxy(short x, short y) { // Windows.h
 	COORD pos{ x, y };
@@ -392,11 +403,13 @@ private:
 	int rot = 0; //rotation
 	int hold = -1;
 	int re_next_count = -1;
+	int block_number = -1;
 
 protected:
 	int table_data[length_x + len_next_x][length_y] = { };
 	int hold_data[8][4] = { };
 	int x = initial_x + (length_x / 2 - 4), y = initial_y;
+	int deleted_line = 0;
 	bool can_hold = true;
 	/*
 	int rot = 0; //rotation
@@ -416,6 +429,7 @@ protected:
 					}
 				}
 			}
+			block_number = 1;
 		}
 		else if (n == 2) {
 			for (int i = 0; i < 4; i++) {
@@ -445,6 +459,7 @@ protected:
 					}
 				}
 			}
+			block_number = 2;
 		}
 		else if (n == 2) {
 			for (int i = 0; i < 4; i++) {
@@ -474,6 +489,7 @@ protected:
 					}
 				}
 			}
+			block_number = 3;
 		}
 		else if (n == 2) {
 			for (int i = 0; i < 4; i++) {
@@ -503,6 +519,7 @@ protected:
 					}
 				}
 			}
+			block_number = 4;
 		}
 		else if (n == 2) {
 			for (int i = 0; i < 4; i++) {
@@ -532,6 +549,7 @@ protected:
 					}
 				}
 			}
+			block_number = 5;
 		}
 		else if (n == 2) {
 			for (int i = 0; i < 4; i++) {
@@ -570,6 +588,7 @@ protected:
 					}
 				}
 			}
+			block_number = 6;
 		}
 		else if (n == 3) {
 			for (int i = 0; i < 4; i++) {
@@ -590,6 +609,7 @@ protected:
 					}
 				}
 			}
+			block_number = 7;
 		}
 		else if (n == 2) {
 			for (int i = 0; i < 4; i++) {
@@ -610,13 +630,13 @@ protected:
 			}
 		}
 	}
-
-	void set_data_block() {
-		set_data_ghost();
-		if (can_block_move()) {
+	
+	void Set_Data_Block() {
+		Set_Data_Ghost();
+		if (Can_Block_Move()) {
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
-					if (is_overlapped_ghost_wall(i, j)) {
+					if (Is_Overlapped_Ghost_Wall(i, j)) {
 						gotoxy(x + 2 * i, y + j);
 						/*
 						if (shape[rot][i][j] == 9) {
@@ -661,7 +681,7 @@ protected:
 			}
 		}
 	}
-	bool can_block_move() {
+	bool Can_Block_Move() {
 		int count = 0;
 		for (int fx = 0; fx < 4; fx++) {
 			for (int fy = 0; fy < 4; fy++) {
@@ -677,7 +697,7 @@ protected:
 		if (count == 0) return true;
 		else return false;
 	}
-	bool is_overlapped_ghost_wall(int i, int j) {
+	bool Is_Overlapped_Ghost_Wall(int i, int j) {
 		int count = 0;
 		if (table_data[x - initial_x + 2 * i][y - initial_y + j] == -2) {
 			count++;
@@ -689,7 +709,7 @@ protected:
 
 	//sold -> delete line
 
-	bool can_ghost_move() {
+	bool Can_Ghost_Move() {
 		int count = 0;
 		for (int fx = 0; fx < 4; fx++) {
 			for (int fy = 0; fy < 4; fy++) {
@@ -705,11 +725,11 @@ protected:
 		if (count == 0) return true;
 		else return false;
 	}
-	void set_data_ghost() {
+	void Set_Data_Ghost() {
 		ghost_y = y;
 		while (true) {
 			ghost_y++;
-			if (can_ghost_move()) continue;
+			if (Can_Ghost_Move()) continue;
 			else {
 				ghost_y--;
 				break;
@@ -732,37 +752,139 @@ protected:
 	void Move(int key) {
 		if (key == LEFT) {
 			x -= 2;
-			if (can_block_move() == false) x += 2;
+			if (Can_Block_Move() == false) x += 2;
 		}
 		else if (key == RIGHT) {
 			x += 2;
-			if (can_block_move() == false) x -= 2;
+			if (Can_Block_Move() == false) x -= 2;
 		}
 		else if (key == DOWN) {
 			y++;
-			if (can_block_move() == false) y--;
+			if (Can_Block_Move() == false) y--;
 		}
 		else { //(key == UP)
 			rot = (rot + 2) % 4;
-			if (can_block_move() == false) {
+			if (Can_Block_Move() == false) {
 				if (rot == 0) rot = 2;
 				else if (rot == 1) rot = 3;
 				else rot -= 2;
 			}
 		}
 	}
-	void Rotate_Plus() { // Z or z
-		rot = (rot + 1) % 4;
-		if (can_block_move() == false) { //undo
-			if (rot == 0) rot = 3;
-			else rot--;
+	void Rotate_Plus() { // X or x or D or d
+		int angle = rot * 90;
+		int temp_x = x, temp_y = y;
+		int preset = 0;
+
+		rot++;
+		if (rot == 4) rot = 0;
+
+		if (3 <= block_number && block_number <= 7) {
+			if (Can_Block_Move() == false) {
+				for (preset = 1; preset <= 5;) {
+					Rotation_Preset(angle, preset, PLUS);
+					if (Can_Block_Move() == false) {
+						x = temp_x, y = temp_y;
+						preset++;
+					}
+					else break;
+				}
+			}
 		}
+		else if(block_number == 2) { // I 미노 
+			
+		}
+
+		if (Can_Block_Move() == false) { //preset 이후에도 회전 불가면 회전 안 함
+			rot--;
+			if (rot == -1) rot = 3;
+		}
+		gotoxy(0, 0);
+		printf("temp x, y = %d %d                  \n", temp_x, temp_y);
+		printf("angle = %d / preset = %d                     ", angle, preset);
 	}
-	void Rotate_Minus() { // X or x
-		if (rot == 0) rot = 3;
-		else rot--;
-		if (can_block_move() == false) { //undo
-			rot = (rot + 1) % 4;
+	void Rotate_Minus() { // Z or z or S or s
+		int angle = rot * 90;
+		int temp_x = x, temp_y = y;
+		int preset = 0;
+
+		rot--;
+		if (rot == -1) rot = 3;
+
+		if (3 <= block_number && block_number <= 7) {
+			if (Can_Block_Move() == false) {
+				for (preset = 1; preset <= 5;) {
+					Rotation_Preset(angle, preset, MINUS);
+					if (Can_Block_Move() == false) {
+						x = temp_x, y = temp_y;
+						preset++;
+					}
+					else break;
+				}
+			}
+		}
+		else if (block_number == 2) { // I 미노 
+
+		}
+
+		if (Can_Block_Move() == false) { //preset 이후에도 회전 불가면 회전 안 함
+			rot++;
+			if (rot == 4) rot = 0;
+		}
+		gotoxy(0, 0);
+		printf("temp x, y = %d %d                  \n", temp_x, temp_y);
+		printf("angle = %d / preset = %d                     ", angle, preset);
+	}
+	void Rotation_Preset(int angle, int preset, int plus)
+	{
+		int type = 0;
+		if ((angle == 0 && plus == 1) || angle == 90 || (angle == 180 && plus == 0)) {
+			if ((angle == 0 && plus == 1) || (angle == 180 && plus == 0)) type = 1;
+			if (angle == 90) type = 0;
+			switch (preset) {
+			case 1:
+				break;
+			case 2:
+				if (type) x -= 2;
+				else x += 2;
+				break;
+			case 3:
+				if (type) x -= 2, y--;
+				else x += 2, y++;
+				break;
+			case 4:
+				if (type) y += 2;
+				else y -= 2;
+				break;
+			case 5:
+				if (type) x -= 2, y += 2;
+				else x == 2, y -= 2;
+				break;
+			}
+		}
+		else if ((angle == 180 && plus == 1) || angle == 270 || (angle == 0 && plus == 0)) {
+			if ((angle == 180 && plus == 1) || (angle == 0 && plus == 0)) type = 1;
+			if (angle == 270) type = 0;
+			switch (preset) {
+			case 1: 
+				break;
+			case 2: 
+				if (type) x += 2; 
+				else x -= 2; 
+				break;
+			case 3: 
+				if (type) x += 2, y--; 
+				else x -= 2, y++; 
+				break;
+			case 4: 
+				if (type) y += 2; 
+				else y -= 2; 
+				break;
+			case 5: 
+				if (type) x += 2, y += 2; 
+				else x -= 2, y -= 2; 
+				break;
+			}
 		}
 	}
 
@@ -789,10 +911,10 @@ protected:
 			whether_next = 0;
 		}
 		rot = 0;
-		set_data_hold();
+		Set_Data_Hold();
 		return whether_next;
 	}
-	void set_data_hold() {
+	void Set_Data_Hold() {
 		if (hold != -1) {
 			if (hold == 1) set_block1(3);
 			else if (hold == 2) set_block2(3);
@@ -815,11 +937,11 @@ protected:
 		}
 	}
 
-	//SpaceBar -> Solid -> delete line
+	//SpaceBar -> Solid -> delete line -> Score
 	void Hard_Drop() { //Hard Drop
 		while (true) {
 			y++;
-			if (can_block_move()) continue;
+			if (Can_Block_Move()) continue;
 			else {
 				y--;
 				Solid();
@@ -831,7 +953,7 @@ protected:
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				if (1 <= block_shape[rot][i][j] && block_shape[rot][i][j] <= 7) {
-					if (is_overlapped_ghost_wall(i, j)) {
+					if (Is_Overlapped_Ghost_Wall(i, j)) {
 						table_data[x - initial_x + 2 * i][y - initial_y + j] = 10 + block_shape[rot][i][j];
 						table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 10 + block_shape[rot][i][j];
 					}
@@ -841,9 +963,9 @@ protected:
 		if (can_hold == false) can_hold = true;
 		rot = 0;
 		//set_nexts_and_hold();
-		delete_line();
+		Delete_Line();
 	}
-	void delete_line() {
+	void Delete_Line() {
 		int count = 0;
 		for (int j = 0; j < length_y; j++) {
 			for (int i = 0; i < length_x; i++) {
@@ -854,6 +976,7 @@ protected:
 				}
 			}
 			if (count >= length_x / 2 - 2) { //delete line
+				deleted_line++;
 				for (int fy = j; fy > 1; fy--) {
 					for (int fx = 0; fx < length_x; fx++) {
 						table_data[fx][fy] = table_data[fx][fy - 1];
@@ -863,11 +986,18 @@ protected:
 				j--;
 			}
 			else count = 0;
-
 		}
+		//빈도수 고려함
+		/*
+		if (deleted_line == 2) {
+			if(t_spin)
+		}
+		*/
 	}
+	
+	
 
-	void set_order_next_block() {
+	void Set_Order_Next_Block() {
 		if (re_next_count >= 7) {
 			re_next_count = 0;
 			for (int i = 0; i < 7; i++) {
@@ -916,15 +1046,15 @@ protected:
 		re_next_count++;
 
 	}
-	void clear_data_next_block() {
+	void Clear_Data_Next_Block() {
 		for (int i = length_x; i < length_x + len_next_x; i++) {
 			for (int j = 0; j < length_y; j++) {
 				table_data[i][j] = 0;
 			}
 		}
 	}
-	void set_data_next_block() {
-		clear_data_next_block();
+	void Set_Data_Next_Block() {
+		Clear_Data_Next_Block();
 		for (int k = 0; k < 5; k++) {
 			if (block_next[re_next_count + k] == 1) set_block1(2);
 			else if (block_next[re_next_count + k] == 2) set_block2(2);
@@ -943,9 +1073,9 @@ protected:
 		}
 	}
 
-	bool is_block_on_ground() {
+	bool Is_Block_On_Ground() {
 		y++;
-		if (can_block_move()) {
+		if (Can_Block_Move()) {
 			y--;
 			return false;
 		}
@@ -969,7 +1099,7 @@ protected:
 class Console : public Block
 {
 public:
-	void clear_console_gametable()
+	void Clear_Console_Gametable()
 	{
 		for (int i = 0; i < length_x; i++) {
 			for (int j = 0; j < length_y; j++) {
@@ -984,7 +1114,7 @@ public:
 			}
 		}
 	}
-	void clear_console_next_block() {
+	void Clear_Console_Next_Block() {
 		for (int i = length_x; i < length_x + len_next_x - 2; i++) {
 			for (int j = 1; j < length_y - 1; j++) {
 				gotoxy(initial_x + i, initial_y + j);
@@ -993,7 +1123,7 @@ public:
 			}
 		}
 	}
-	void clear_console_hold() {
+	void Clear_Console_Hold() {
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 4; j++) {
 				gotoxy(hold_ini_x + i, hold_ini_y + j);
@@ -1004,7 +1134,7 @@ public:
 
 
 	//draw_console
-	void draw_console_basic_frame(int len_x, int len_y, int i_x, int i_y) {
+	void Draw_Console_Basic_Frame(int len_x, int len_y, int i_x, int i_y) {
 		int pos[2] = { i_x, i_y };
 		len_x--; //보정 
 		for (int i = 0; i <= len_x; i++) {
@@ -1037,7 +1167,7 @@ public:
 			table_data[length_x - 1][i] = 10;
 		}
 	}
-	void draw_console_gametable() {
+	void Draw_Console_Gametable() {
 		for (int fx = 0; fx < length_x + len_next_x; fx++) {
 			for (int fy = 0; fy < length_y; fy++) {
 				if (table_data[fx][fy] == 0 || table_data[fx][fy] == 10) continue;
@@ -1155,7 +1285,7 @@ public:
 	}
 
 	//test
-	void print_gametable_data() {
+	void Print_Gametable_Data() {
 
 		gotoxy(initial_x + length_x + 14, initial_y);
 		for (int i = 0; i < length_y; i++) {
@@ -1194,6 +1324,7 @@ public:
 class Game : public Console
 {
 private:
+	unsigned int score = 0;
 	bool next_block = false;
 	bool bool_Auto_Down = false;
 	bool counting_on_ground = false;
@@ -1214,56 +1345,18 @@ public:
 		Tetris_Menu.Start_Main_Menu();
 		system("cls");
 
-		draw_console_basic_frame(length_x, length_y, initial_x, initial_y); // frame 그리기
-		set_order_next_block(); //초기 블럭, 넥스트 블럭 결정
-		set_data_block(); //초기 블럭 데이터 입력
-		set_data_next_block(); // 넥스트 블럭 데이터 입력
-		draw_console_gametable(); // 입력된 데이터를 출력
+		Draw_Console_Basic_Frame(length_x, length_y, initial_x, initial_y); // frame 그리기
+		Set_Order_Next_Block(); //초기 블럭, 넥스트 블럭 결정
+		Set_Data_Block(); //초기 블럭 데이터 입력
+		Set_Data_Next_Block(); // 넥스트 블럭 데이터 입력
+		Draw_Console_Gametable(); // 입력된 데이터를 출력
 
 		Auto_Down_Start = clock();
 		while (true) //키 입력
 		{
 			int key;
-			Auto_Down_End = clock();
-			if (counting_on_ground) On_Ground_End = clock();
 
-			Auto_Down_Time = ((float)(Auto_Down_End - Auto_Down_Start) / CLOCKS_PER_SEC) + Temp_Time_Auto_Down;
-			if (counting_on_ground) On_Ground_Time = ((float)(On_Ground_End - On_Ground_Start) / CLOCKS_PER_SEC) + Temp_Time_On_Ground;
-
-			if (Auto_Down_Time >= 1) { // DOWN or SOLID
-				y++;
-				bool_Auto_Down = true;
-				if (can_block_move()) {
-					set_data_block();
-					Auto_Down(TIME_START);
-				}
-				else {
-					y--;
-					Solid();
-					next_block = true;
-					Auto_Down(TIME_START);
-				}
-			}
-			if (is_block_on_ground()) { // On_Ground 측정
-				if (counting_on_ground == false) { // 측정 중이 아니였나면 측정 시작
-					On_Ground(TIME_RESTART);
-					counting_on_ground = true;
-				}
-			}
-			else { // On_Ground 아니면
-				if (counting_on_ground == true) { // 측정 중단
-					On_Ground(TIME_STOP);
-					counting_on_ground = false;
-				}
-			}
-			if (On_Ground_Time >= 3 && is_block_on_ground()) { //소프트 드랍으로 Solid가 안되게 하는 오류 수정
-				Solid();
-				next_block = true;
-				bool_Auto_Down = true;
-				counting_on_ground = false;
-				Auto_Down(TIME_RESTART);
-				On_Ground(TIME_RESET);
-			}
+			Gravity(); //중력(Auto Down)
 			if (_kbhit() || bool_Auto_Down) {
 				if (_kbhit()) {
 					key = _getch();
@@ -1293,15 +1386,21 @@ public:
 					else if (key == 97 || key == 65) { // A or a 
 						if (can_hold) {
 							next_block = Hold();
-							clear_console_hold();
+							Clear_Console_Hold();
 							can_hold = false;
 						}
 						else continue;
 					}
-					else if (key == 90 || key == 122 || key == 115 || key == 83) // Z or z or S or s
+					else if (key == 88 || key == 120 || key == 100 || key == 68) { // X or x or D or d
+						Auto_Down_Time = 0;
+						Auto_Down_Start = clock();
 						Rotate_Plus();
-					else if (key == 88 || key == 120 || key == 100 || key == 68) // X or x
+					}
+					else if (key == 90 || key == 122 || key == 115 || key == 83) { // Z or z or S or s
+						Auto_Down_Time = 0;
+						Auto_Down_Start = clock();
 						Rotate_Minus();
+					}
 					else if (key == 32) { // SpaceBar 
 						Hard_Drop();
 						next_block = true;
@@ -1319,30 +1418,33 @@ public:
 					break;
 				}
 				if (next_block) {
-					set_order_next_block(); // next 갱신
-					clear_console_gametable();  // 콘솔 지우기
-					clear_console_next_block(); // 콘솔 지우기
+					Set_Order_Next_Block(); // next 갱신
+					Clear_Console_Gametable();  // 콘솔 지우기
+					Clear_Console_Next_Block(); // 콘솔 지우기
 					x = initial_x + (length_x / 2 - 4), y = initial_y; // 위치 초기화
-					set_data_block(); // 블록 데이터 입력
-					set_data_next_block(); // 넥스트 데이터 입력
+					Set_Data_Block(); // 블록 데이터 입력
+					Set_Data_Next_Block(); // 넥스트 데이터 입력
 					next_block = false;
-					On_Ground(TIME_RESET);
+					On_Ground_Times(TIME_RESET);
 				}
-				else if (can_block_move()) {
-					clear_console_gametable(); //clear
-					set_data_block(); // 블록 데이터 입력
+				else if (Can_Block_Move()) {
+					Clear_Console_Gametable(); //clear
+					Set_Data_Block(); // 블록 데이터 입력
 				}
+
+				//마무리 - 데이터 정리 및 마무리 함수
+
+				Score(deleted_line); //점수 추가
+
 
 				bool_Auto_Down = false;
-				//draw_frame(length_x, length_y, initial_x, initial_y);
-				draw_console_gametable(); // gametable Reload!!
-
-				print_gametable_data(); //test
+				Draw_Console_Gametable(); // gametable Reload!!
+				Print_Gametable_Data(); //test
 
 			}
 		}
 	}
-	void Auto_Down(int CONDITION) {
+	void Auto_Down_Times(int CONDITION) {
 		if (CONDITION == TIME_START) {
 			Auto_Down_Start = clock();
 		}
@@ -1361,7 +1463,7 @@ public:
 			Auto_Down_Start = clock();
 		}
 	}
-	void On_Ground(int CONDITION) {
+	void On_Ground_Times(int CONDITION) {
 		if (CONDITION == TIME_START) {
 			On_Ground_Start = clock();
 		}
@@ -1380,7 +1482,70 @@ public:
 			On_Ground_Start = clock();
 		}
 	}
+	void Gravity() {
+		Auto_Down_End = clock();
+		if (counting_on_ground) On_Ground_End = clock();
+		Auto_Down_Time = ((float)(Auto_Down_End - Auto_Down_Start) / CLOCKS_PER_SEC) + Temp_Time_Auto_Down;
+		if (counting_on_ground) On_Ground_Time = ((float)(On_Ground_End - On_Ground_Start) / CLOCKS_PER_SEC) + Temp_Time_On_Ground;
+		if (Auto_Down_Time >= 1) { // DOWN or SOLID
+			y++;
+			bool_Auto_Down = true;
+			if (Can_Block_Move()) {
+				Set_Data_Block();
+				Auto_Down_Times(TIME_START);
+			}
+			else {
+				y--;
+				Solid();
+				next_block = true;
+				Auto_Down_Times(TIME_START);
+			}
+		}
+		if (Is_Block_On_Ground()) { // On_Ground 측정
+			if (counting_on_ground == false) { // 측정 중이 아니였나면 측정 시작
+				On_Ground_Times(TIME_RESTART);
+				counting_on_ground = true;
+			}
+		}
+		else { // On_Ground 아니면
+			if (counting_on_ground == true) { // 측정 중단
+				On_Ground_Times(TIME_STOP);
+				counting_on_ground = false;
+			}
+		}
+		if (On_Ground_Time >= 3 && Is_Block_On_Ground()) { //소프트 드랍으로 Solid가 안되게 하는 오류 수정
+			Solid();
+			next_block = true;
+			bool_Auto_Down = true;
+			counting_on_ground = false;
+			Auto_Down_Times(TIME_RESTART);
+			On_Ground_Times(TIME_RESET);
+		}
+	}
 
+	void Score(int CONDITION) {
+		if (CONDITION == DROP) {
+
+		}
+		else if (CONDITION == T_SPIN) {
+
+		}
+		else if (CONDITION == TETRIS) {
+
+		}
+		else if (CONDITION == THREE_LINE_CLEAR) {
+
+		}
+		else if (CONDITION == TWO_LINE_CLEAR) {
+
+		}
+		else if (CONDITION == ONE_LINE_CLEAR) {
+
+		}
+		else if (CONDITION == BACK_TO_BACK) {
+
+		}
+	}
 };
 
 int main()
@@ -1395,9 +1560,5 @@ int main()
 	gotoxy(0, 50);
 }
 
-
-
-
-
-
-
+//https://gall.dcinside.com/mgallery/board/view/?id=pute&no=19824 //한국어
+//https://harddrop.com/wiki/SRS#Basic_Rotation //영어 (자세함)
