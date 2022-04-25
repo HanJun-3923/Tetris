@@ -5,21 +5,70 @@
 #include <stdlib.h>
 using namespace std;
 
-#define length_x 24
-#define length_y 25
-#define initial_x 20
-#define initial_y 5
+enum SYSTEM_CONDITION
+{
+	SYSTEM_OK,
+	SYSTEM_PAUSE,
+	SYSTEM_ERROR
+};
+enum TIME {
+	TIME_START,
+	TIME_RESTART,
+	TIME_STOP,
+	TIME_RESET
+};
+enum BLOCK_STATE {
+	JUST_DELETE,
+	T_SPIN,
+	T_SPIN_MINI,
+	BACK_TO_BACK,
+	COMBO,
+	SOFT_DROP,
+	HARD_DROP
+};
+enum PLUS_MINUS {
+	PLUS = 1,
+	MINUS = 0
+};
+enum KEYS {
+	LEFT = 75,
+	RIGHT = 77,
+	UP = 72,
+	DOWN = 80,
 
-#define len_next_x 12
+	ESC = 27,
 
-#define hold_ini_x 10
-#define hold_ini_y 6
+	ARROW = 224,
 
-#define LEFT 75 // ←
-#define RIGHT 77  // →
-#define UP 72 // ↑
-#define DOWN 80 // ↓
+	SPACEBAR = 32,
+	KEY_A = 65,
+	KEY_C = 67,
+	KEY_D = 68,
+	KEY_S = 83,
+	KEY_X = 88,
+	KEY_Z = 90,
+	KEY_LOWER_A = 97,
+	KEY_LOWER_C = 99,
+	KEY_LOWER_D = 100,
+	KEY_LOWER_S = 115,
+	KEY_LOWER_X = 120,
+	KEY_LOWER_Z = 122
+};
+enum COORDINATE {
+	LENGTH_X = 24,
+	LENGTH_Y = 25,
+	INITIAL_X = 20,
+	INITIAL_Y = 5,
 
+	LENGTH_NEXT_X = 12,
+	//LEN_NEXT_Y = LENGTH_Y
+
+	HOLD_INITIAL_X = 10,
+	HOLD_INITIAL_Y = 6,
+
+	INFO_INITIAL_X = 60,
+	INFO_INITIAL_Y = 7
+};
 
 //□ ■ ○ ● ▩ ▤ ▥ ▨ ▧ ▦ ▣ ⊙
 /* table_data 번호 의미
@@ -237,31 +286,6 @@ const int block7[4][4][4] = {
 
 };
 
-enum SYSTEM_CONDITION
-{
-	SYSTEM_OK,
-	SYSTEM_PAUSE,
-	SYSTEM_ERROR
-};
-enum TIME {
-	TIME_START,
-	TIME_RESTART,
-	TIME_STOP,
-	TIME_RESET
-};
-enum BLOCK_STATE {
-	DROP,
-	T_SPIN,
-	TETRIS = 4,
-	THREE_LINE_CLEAR = 3,
-	TWO_LINE_CLEAR = 2,
-	ONE_LINE_CLEAR = 1,
-	BACK_TO_BACK
-};
-enum PLUS_MINUS {
-	PLUS = 1,
-	MINUS = 0
-};
 //기본 함수들
 void gotoxy(short x, short y) { // Windows.h
 	COORD pos{ x, y };
@@ -396,7 +420,7 @@ class Block
 {
 private:
 	int block_next[14] = { }; // 7 blocks(1 bag) x 2
-	int ghost_y = initial_y;
+	int ghost_y = INITIAL_Y;
 	int next_shape[4][4][4] = { };
 	int hold_shape[4][4][4] = { };
 	int block_shape[4][4][4] = { };
@@ -406,14 +430,16 @@ private:
 	int block_number = -1;
 
 protected:
-	int table_data[length_x + len_next_x][length_y] = { };
+	int table_data[LENGTH_X + LENGTH_NEXT_X][LENGTH_Y] = { };
 	int hold_data[8][4] = { };
-	int x = initial_x + (length_x / 2 - 4), y = initial_y;
+	int x = INITIAL_X + (LENGTH_X / 2 - 4), y = INITIAL_Y;
+	bool can_hold = true, Back_to_Back = false;
+	unsigned int score = 0, combo = 0;
 	int deleted_line = 0;
-	bool can_hold = true;
+
 	/*
 	int rot = 0; //rotation
-	int x = initial_x + (length_x / 2 - 4), y = initial_y + 1;
+	int x = INITIAL_X + (LENGTH_X / 2 - 4), y = INITIAL_Y + 1;
 	int shape[4][4][4] = { };
 	int block_next[14] = { }; // 7 blocks(1 bag) x 2
 	int hold = -1;
@@ -640,38 +666,38 @@ protected:
 						gotoxy(x + 2 * i, y + j);
 						/*
 						if (shape[rot][i][j] == 9) {
-							table_data[x - initial_x + 2 * i][y - initial_y + j] = 9;
-							table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 9;
+							table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] = 9;
+							table_data[x - INITIAL_X + 2 * i + 1][y - INITIAL_Y + j] = 9;
 						}
 						*/
 						switch (block_shape[rot][i][j]) {
 						case 1:
-							table_data[x - initial_x + 2 * i][y - initial_y + j] = 1;
-							table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 1;
+							table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] = 1;
+							table_data[x - INITIAL_X + 2 * i + 1][y - INITIAL_Y + j] = 1;
 							break;
 						case 2:
-							table_data[x - initial_x + 2 * i][y - initial_y + j] = 2;
-							table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 2;
+							table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] = 2;
+							table_data[x - INITIAL_X + 2 * i + 1][y - INITIAL_Y + j] = 2;
 							break;
 						case 3:
-							table_data[x - initial_x + 2 * i][y - initial_y + j] = 3;
-							table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 3;
+							table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] = 3;
+							table_data[x - INITIAL_X + 2 * i + 1][y - INITIAL_Y + j] = 3;
 							break;
 						case 4:
-							table_data[x - initial_x + 2 * i][y - initial_y + j] = 4;
-							table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 4;
+							table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] = 4;
+							table_data[x - INITIAL_X + 2 * i + 1][y - INITIAL_Y + j] = 4;
 							break;
 						case 5:
-							table_data[x - initial_x + 2 * i][y - initial_y + j] = 5;
-							table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 5;
+							table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] = 5;
+							table_data[x - INITIAL_X + 2 * i + 1][y - INITIAL_Y + j] = 5;
 							break;
 						case 6:
-							table_data[x - initial_x + 2 * i][y - initial_y + j] = 6;
-							table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 6;
+							table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] = 6;
+							table_data[x - INITIAL_X + 2 * i + 1][y - INITIAL_Y + j] = 6;
 							break;
 						case 7:
-							table_data[x - initial_x + 2 * i][y - initial_y + j] = 7;
-							table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 7;
+							table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] = 7;
+							table_data[x - INITIAL_X + 2 * i + 1][y - INITIAL_Y + j] = 7;
 							break;
 
 						}
@@ -686,10 +712,10 @@ protected:
 		for (int fx = 0; fx < 4; fx++) {
 			for (int fy = 0; fy < 4; fy++) {
 				if (1 <= block_shape[rot][fy][fx] && block_shape[rot][fy][fx] <= 7) {
-					if (table_data[x - initial_x + (2 * fy)][y - initial_y + fx] == 10)
+					if (table_data[x - INITIAL_X + (2 * fy)][y - INITIAL_Y + fx] == 10)
 						count++;
 
-					if (11 <= table_data[x - initial_x + (2 * fy)][y - initial_y + fx] && table_data[x - initial_x + (2 * fy)][y - initial_y + fx] <= 17)
+					if (11 <= table_data[x - INITIAL_X + (2 * fy)][y - INITIAL_Y + fx] && table_data[x - INITIAL_X + (2 * fy)][y - INITIAL_Y + fx] <= 17)
 						count++;
 				}
 			}
@@ -699,7 +725,7 @@ protected:
 	}
 	bool Is_Overlapped_Ghost_Wall(int i, int j) {
 		int count = 0;
-		if (table_data[x - initial_x + 2 * i][y - initial_y + j] == -2) {
+		if (table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] == -2) {
 			count++;
 		}
 
@@ -714,10 +740,10 @@ protected:
 		for (int fx = 0; fx < 4; fx++) {
 			for (int fy = 0; fy < 4; fy++) {
 				if (1 <= block_shape[rot][fy][fx] && block_shape[rot][fy][fx] <= 7) {
-					if (table_data[x - initial_x + (2 * fy)][ghost_y - initial_y + fx] == 10)
+					if (table_data[x - INITIAL_X + (2 * fy)][ghost_y - INITIAL_Y + fx] == 10)
 						count++;
 
-					if (11 <= table_data[x - initial_x + (2 * fy)][ghost_y - initial_y + fx] && table_data[x - initial_x + (2 * fy)][ghost_y - initial_y + fx] <= 17)
+					if (11 <= table_data[x - INITIAL_X + (2 * fy)][ghost_y - INITIAL_Y + fx] && table_data[x - INITIAL_X + (2 * fy)][ghost_y - INITIAL_Y + fx] <= 17)
 						count++;
 				}
 			}
@@ -739,8 +765,8 @@ protected:
 			for (int j = 0; j < 4; j++) {
 				gotoxy(x + 2 * i, ghost_y + j);
 				if (1 <= block_shape[rot][i][j] && block_shape[rot][i][j] <= 7) {
-					table_data[x - initial_x + 2 * i][ghost_y - initial_y + j] = -1;
-					table_data[x - initial_x + 2 * i + 1][ghost_y - initial_y + j] = -1;
+					table_data[x - INITIAL_X + 2 * i][ghost_y - INITIAL_Y + j] = -1;
+					table_data[x - INITIAL_X + 2 * i + 1][ghost_y - INITIAL_Y + j] = -1;
 				}
 			}
 		}
@@ -761,6 +787,7 @@ protected:
 		else if (key == DOWN) {
 			y++;
 			if (Can_Block_Move() == false) y--;
+			else Drop_Score(SOFT_DROP);
 		}
 		else { //(key == UP)
 			rot = (rot + 2) % 4;
@@ -771,6 +798,7 @@ protected:
 			}
 		}
 	}
+
 	void Rotate_Plus() { // X or x or D or d
 		int angle = rot * 90;
 		int temp_x = x, temp_y = y;
@@ -887,11 +915,17 @@ protected:
 			}
 		}
 	}
+	void Three_Corner_Rule() {
+
+	}
+	void Two_Corner_Rule() {
+
+	}
 
 	bool Hold() {
 		bool whether_next;
 		int temp;
-		x = initial_x + (length_x / 2 - 4), y = initial_y;
+		x = INITIAL_X + (LENGTH_X / 2 - 4), y = INITIAL_Y;
 		if (hold == -1) {
 			hold = block_next[re_next_count - 1];
 			whether_next = 1;
@@ -954,8 +988,8 @@ protected:
 			for (int j = 0; j < 4; j++) {
 				if (1 <= block_shape[rot][i][j] && block_shape[rot][i][j] <= 7) {
 					if (Is_Overlapped_Ghost_Wall(i, j)) {
-						table_data[x - initial_x + 2 * i][y - initial_y + j] = 10 + block_shape[rot][i][j];
-						table_data[x - initial_x + 2 * i + 1][y - initial_y + j] = 10 + block_shape[rot][i][j];
+						table_data[x - INITIAL_X + 2 * i][y - INITIAL_Y + j] = 10 + block_shape[rot][i][j];
+						table_data[x - INITIAL_X + 2 * i + 1][y - INITIAL_Y + j] = 10 + block_shape[rot][i][j];
 					}
 				}
 			}
@@ -967,18 +1001,19 @@ protected:
 	}
 	void Delete_Line() {
 		int count = 0;
-		for (int j = 0; j < length_y; j++) {
-			for (int i = 0; i < length_x; i++) {
+
+		for (int j = 0; j < LENGTH_Y; j++) {
+			for (int i = 0; i < LENGTH_X; i++) {
 				if (i % 2 == 0) {
 					if (11 <= table_data[i][j] && table_data[i][j] <= 17) {
 						count++;
 					}
 				}
 			}
-			if (count >= length_x / 2 - 2) { //delete line
+			if (count >= LENGTH_X / 2 - 2) { //delete line
 				deleted_line++;
 				for (int fy = j; fy > 1; fy--) {
-					for (int fx = 0; fx < length_x; fx++) {
+					for (int fx = 0; fx < LENGTH_X; fx++) {
 						table_data[fx][fy] = table_data[fx][fy - 1];
 					}
 				}
@@ -987,6 +1022,7 @@ protected:
 			}
 			else count = 0;
 		}
+		
 		//빈도수 고려함
 		/*
 		if (deleted_line == 2) {
@@ -995,7 +1031,37 @@ protected:
 		*/
 	}
 	
-	
+	void Clear_Lines_Score(int CONDITION, int Lines) {
+		if (CONDITION == JUST_DELETE) {
+			if (Lines == 1) score += 100, Back_to_Back = false;
+			else if (Lines == 2) score += 300, Back_to_Back = false;
+			else if (Lines == 3) score += 500, Back_to_Back = false;
+			else { //Lines == 4
+				if (Back_to_Back) score += 1200;
+				else score += 800, Back_to_Back = true;
+			}
+		}
+		else if (CONDITION == T_SPIN) {
+			if (Lines == 2) { if (Back_to_Back) score += 1800; else score += 1200, Back_to_Back = true; }
+			else if (Lines == 3) { if (Back_to_Back) score += 2400; else score += 1600, Back_to_Back = true; }
+			else { if (Back_to_Back) score += 1200; else score += 800, Back_to_Back = true; }
+		}
+	}
+	void Drop_Score(int CONDITION) {
+		int Left_Lines = 0;
+		int temp_y = y;
+		if (CONDITION == HARD_DROP) {
+			for (;;) {
+				y++;
+				if (Can_Block_Move()) Left_Lines++;
+				else break;
+			}
+			score += Left_Lines * 2;
+		}
+		else
+			score++;
+		y = temp_y;
+	}
 
 	void Set_Order_Next_Block() {
 		if (re_next_count >= 7) {
@@ -1047,8 +1113,8 @@ protected:
 
 	}
 	void Clear_Data_Next_Block() {
-		for (int i = length_x; i < length_x + len_next_x; i++) {
-			for (int j = 0; j < length_y; j++) {
+		for (int i = LENGTH_X; i < LENGTH_X + LENGTH_NEXT_X; i++) {
+			for (int j = 0; j < LENGTH_Y; j++) {
 				table_data[i][j] = 0;
 			}
 		}
@@ -1066,8 +1132,8 @@ protected:
 
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 3; j++) {
-					table_data[length_x + 2 * i + 1][4 * k + j - k] = next_shape[0][i][j];
-					table_data[length_x + 2 * i + 2][4 * k + j - k] = next_shape[0][i][j];
+					table_data[LENGTH_X + 2 * i + 1][4 * k + j - k] = next_shape[0][i][j];
+					table_data[LENGTH_X + 2 * i + 2][4 * k + j - k] = next_shape[0][i][j];
 				}
 			}
 		}
@@ -1101,23 +1167,23 @@ class Console : public Block
 public:
 	void Clear_Console_Gametable()
 	{
-		for (int i = 0; i < length_x; i++) {
-			for (int j = 0; j < length_y; j++) {
+		for (int i = 0; i < LENGTH_X; i++) {
+			for (int j = 0; j < LENGTH_Y; j++) {
 				if ((1 <= table_data[i][j] && table_data[i][j] <= 7) || table_data[i][j] == -1) table_data[i][j] = 0;
 			}
 		}
-		for (int i = 2; i < length_x - 2; i++) {
-			for (int j = 1; j < length_y - 1; j++) {
-				gotoxy(initial_x + i, initial_y + j);
+		for (int i = 2; i < LENGTH_X - 2; i++) {
+			for (int j = 1; j < LENGTH_Y - 1; j++) {
+				gotoxy(INITIAL_X + i, INITIAL_Y + j);
 				if (table_data[i][j] != 10 && !(11 <= table_data[i][j] && table_data[i][j] <= 17))
 					cout << " ";
 			}
 		}
 	}
 	void Clear_Console_Next_Block() {
-		for (int i = length_x; i < length_x + len_next_x - 2; i++) {
-			for (int j = 1; j < length_y - 1; j++) {
-				gotoxy(initial_x + i, initial_y + j);
+		for (int i = LENGTH_X; i < LENGTH_X + LENGTH_NEXT_X - 2; i++) {
+			for (int j = 1; j < LENGTH_Y - 1; j++) {
+				gotoxy(INITIAL_X + i, INITIAL_Y + j);
 				if (table_data[i][j] != 10 && !(11 <= table_data[i][j] && table_data[i][j] <= 17))
 					cout << " ";
 			}
@@ -1126,7 +1192,7 @@ public:
 	void Clear_Console_Hold() {
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 4; j++) {
-				gotoxy(hold_ini_x + i, hold_ini_y + j);
+				gotoxy(HOLD_INITIAL_X + i, HOLD_INITIAL_Y + j);
 				cout << " ";
 			}
 		}
@@ -1144,32 +1210,31 @@ public:
 			}
 			table_data[i][0] = -2;
 		}
-
 		for (int i = 0; i <= len_x; i++) {
 			if (i % 2 == 0) {
 				gotoxy(pos[0] + i, pos[1] + len_y - 1);
 				cout << "▩";
 			}
-			table_data[i][length_y - 1] = 10;
+			table_data[i][LENGTH_Y - 1] = 10;
 		}
-
 		for (int i = 1; i < len_y - 1; i++) {
 			gotoxy(pos[0], pos[1] + i);
 			cout << "▩";
 			table_data[0][i] = 10;
 			table_data[1][i] = 10;
 		}
-
 		for (int i = 1; i < len_y - 1; i++) {
 			gotoxy(pos[0] + len_x - 1, pos[1] + i);
 			cout << "▩";
-			table_data[length_x - 2][i] = 10;
-			table_data[length_x - 1][i] = 10;
+			table_data[LENGTH_X - 2][i] = 10;
+			table_data[LENGTH_X - 1][i] = 10;
 		}
+
+		
 	}
 	void Draw_Console_Gametable() {
-		for (int fx = 0; fx < length_x + len_next_x; fx++) {
-			for (int fy = 0; fy < length_y; fy++) {
+		for (int fx = 0; fx < LENGTH_X + LENGTH_NEXT_X; fx++) {
+			for (int fy = 0; fy < LENGTH_Y; fy++) {
 				if (table_data[fx][fy] == 0 || table_data[fx][fy] == 10) continue;
 				else if (1 <= table_data[fx][fy] && table_data[fx][fy] <= 7) {
 					switch (table_data[fx][fy]) {
@@ -1196,7 +1261,7 @@ public:
 						break;
 					}
 					if (fx % 2 == 0) {
-						gotoxy(fx + initial_x, fy + initial_y);
+						gotoxy(fx + INITIAL_X, fy + INITIAL_Y);
 						cout << "■";
 					}
 					setcolor(15);
@@ -1227,7 +1292,7 @@ public:
 						break;
 					}
 					if (fx % 2 == 0) {
-						gotoxy(fx + initial_x, fy + initial_y);
+						gotoxy(fx + INITIAL_X, fy + INITIAL_Y);
 						cout << "▣";
 					}
 					setcolor(15);
@@ -1235,13 +1300,13 @@ public:
 				else if (table_data[fx][fy] == -1) {
 					//no color
 					if (fx % 2 == 0) {
-						gotoxy(fx + initial_x, fy + initial_y);
+						gotoxy(fx + INITIAL_X, fy + INITIAL_Y);
 						cout << "□";
 					}
 				}
 				else if (table_data[fx][fy] == -2) {
 					if (fx % 2 == 0) {
-						gotoxy(fx + initial_x, fy + initial_y);
+						gotoxy(fx + INITIAL_X, fy + INITIAL_Y);
 						cout << "▩";
 					}
 				}
@@ -1275,7 +1340,7 @@ public:
 						break;
 					}
 					if (i % 2 == 0) {
-						gotoxy(hold_ini_x + i, hold_ini_y + j);
+						gotoxy(HOLD_INITIAL_X + i, HOLD_INITIAL_Y + j);
 						cout << "■";
 					}
 					setcolor(15);
@@ -1283,13 +1348,18 @@ public:
 			}
 		}
 	}
+	void Draw_Console_Info(int score) {
+		gotoxy(INFO_INITIAL_X, INFO_INITIAL_Y);
+		cout << "Score: " << score << endl;
+		
+	}
 
 	//test
 	void Print_Gametable_Data() {
 
-		gotoxy(initial_x + length_x + 14, initial_y);
-		for (int i = 0; i < length_y; i++) {
-			for (int j = 0; j < length_x + len_next_x; j++) {
+		gotoxy(INITIAL_X + LENGTH_X + 14, INITIAL_Y);
+		for (int i = 0; i < LENGTH_Y; i++) {
+			for (int j = 0; j < LENGTH_X + LENGTH_NEXT_X; j++) {
 				if (table_data[j][i] == 10) {
 					if (j % 2 == 0)
 						cout << "▩";
@@ -1308,12 +1378,12 @@ public:
 					else cout << table_data[j][i];
 				}
 			}
-			gotoxy(initial_x + length_x + 14, initial_y + i + 1);
+			gotoxy(INITIAL_X + LENGTH_X + 14, INITIAL_Y + i + 1);
 		}
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 4; j++) {
 				if (i % 2 == 0) {
-					gotoxy(2 * (length_x + initial_x + len_next_x) + i - 6, initial_y + j);
+					gotoxy(2 * (LENGTH_X + INITIAL_X + LENGTH_NEXT_X) + i - 6, INITIAL_Y + j);
 					cout << hold_data[i][j];
 				}
 			}
@@ -1324,10 +1394,7 @@ public:
 class Game : public Console
 {
 private:
-	unsigned int score = 0;
-	bool next_block = false;
-	bool bool_Auto_Down = false;
-	bool counting_on_ground = false;
+	bool next_block = false, bool_Auto_Down = false, counting_on_ground = false;
 
 	clock_t Auto_Down_Start = 0, Auto_Down_End = 0;
 	float Auto_Down_Time = 0;
@@ -1345,7 +1412,7 @@ public:
 		Tetris_Menu.Start_Main_Menu();
 		system("cls");
 
-		Draw_Console_Basic_Frame(length_x, length_y, initial_x, initial_y); // frame 그리기
+		Draw_Console_Basic_Frame(LENGTH_X, LENGTH_Y, INITIAL_X, INITIAL_Y); // frame 그리기
 		Set_Order_Next_Block(); //초기 블럭, 넥스트 블럭 결정
 		Set_Data_Block(); //초기 블럭 데이터 입력
 		Set_Data_Next_Block(); // 넥스트 블럭 데이터 입력
@@ -1360,30 +1427,27 @@ public:
 			if (_kbhit() || bool_Auto_Down) {
 				if (_kbhit()) {
 					key = _getch();
-					if (key == 224) {
+					if (key == ARROW) {
 						key = _getch();
 						switch (key) {
 						case UP:
 							Move(UP);
 							break;
 						case DOWN:
-							Auto_Down_Time = 0;
-							Auto_Down_Start = clock();
+							Auto_Down_Times(TIME_RESET);
 							Move(DOWN);
 							break;
 						case LEFT:
-							Auto_Down_Time = 0;
-							Auto_Down_Start = clock();
+							Auto_Down_Times(TIME_RESET);
 							Move(LEFT);
 							break;
 						case RIGHT:
-							Auto_Down_Time = 0;
-							Auto_Down_Start = clock();
+							Auto_Down_Times(TIME_RESET);
 							Move(RIGHT);
 							break;
 						}
 					}
-					else if (key == 97 || key == 65) { // A or a 
+					else if (key == KEY_A || key == KEY_LOWER_A || key == KEY_C || key == KEY_LOWER_C) { // A or a 
 						if (can_hold) {
 							next_block = Hold();
 							Clear_Console_Hold();
@@ -1391,21 +1455,20 @@ public:
 						}
 						else continue;
 					}
-					else if (key == 88 || key == 120 || key == 100 || key == 68) { // X or x or D or d
-						Auto_Down_Time = 0;
-						Auto_Down_Start = clock();
+					else if (key == KEY_X || key == KEY_LOWER_X || key == KEY_D || key == KEY_LOWER_D) { // X or x or D or d
+						Auto_Down_Times(TIME_RESET);
 						Rotate_Plus();
 					}
-					else if (key == 90 || key == 122 || key == 115 || key == 83) { // Z or z or S or s
-						Auto_Down_Time = 0;
-						Auto_Down_Start = clock();
+					else if (key == KEY_Z || key == KEY_LOWER_Z || key == KEY_S || key == KEY_LOWER_S) { // Z or z or S or s
+						Auto_Down_Times(TIME_RESET);
 						Rotate_Minus();
 					}
-					else if (key == 32) { // SpaceBar 
+					else if (key == SPACEBAR) { // SpaceBar 
+						Drop_Score(HARD_DROP);
 						Hard_Drop();
 						next_block = true;
 					}
-					else if (key == 27) {
+					else if (key == ESC) {
 						//game_pause();
 						break;
 					}
@@ -1421,11 +1484,12 @@ public:
 					Set_Order_Next_Block(); // next 갱신
 					Clear_Console_Gametable();  // 콘솔 지우기
 					Clear_Console_Next_Block(); // 콘솔 지우기
-					x = initial_x + (length_x / 2 - 4), y = initial_y; // 위치 초기화
+					x = INITIAL_X + (LENGTH_X / 2 - 4), y = INITIAL_Y; // 위치 초기화
 					Set_Data_Block(); // 블록 데이터 입력
 					Set_Data_Next_Block(); // 넥스트 데이터 입력
 					next_block = false;
 					On_Ground_Times(TIME_RESET);
+					if(deleted_line > 0) Clear_Lines_Score(JUST_DELETE, deleted_line), deleted_line = 0;
 				}
 				else if (Can_Block_Move()) {
 					Clear_Console_Gametable(); //clear
@@ -1434,13 +1498,10 @@ public:
 
 				//마무리 - 데이터 정리 및 마무리 함수
 
-				Score(deleted_line); //점수 추가
-
 
 				bool_Auto_Down = false;
+				Draw_Console_Info(score);
 				Draw_Console_Gametable(); // gametable Reload!!
-				Print_Gametable_Data(); //test
-
 			}
 		}
 	}
@@ -1522,30 +1583,6 @@ public:
 			On_Ground_Times(TIME_RESET);
 		}
 	}
-
-	void Score(int CONDITION) {
-		if (CONDITION == DROP) {
-
-		}
-		else if (CONDITION == T_SPIN) {
-
-		}
-		else if (CONDITION == TETRIS) {
-
-		}
-		else if (CONDITION == THREE_LINE_CLEAR) {
-
-		}
-		else if (CONDITION == TWO_LINE_CLEAR) {
-
-		}
-		else if (CONDITION == ONE_LINE_CLEAR) {
-
-		}
-		else if (CONDITION == BACK_TO_BACK) {
-
-		}
-	}
 };
 
 int main()
@@ -1560,5 +1597,9 @@ int main()
 	gotoxy(0, 50);
 }
 
-//https://gall.dcinside.com/mgallery/board/view/?id=pute&no=19824 //한국어
-//https://harddrop.com/wiki/SRS#Basic_Rotation //영어 (자세함)
+//https://gall.dcinside.com/mgallery/board/view/?id=pute&no=19824 // 회전 원리 한국어
+//https://harddrop.com/wiki/SRS#Basic_Rotation // 회전 원리 영어 (자세함)
+//https://tetris.wiki/Scoring // 점수 체계 (영어)
+//https://four.lol/srs/t-spin // T-SPIN 체계 (영어)
+
+
