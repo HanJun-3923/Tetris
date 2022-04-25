@@ -74,8 +74,13 @@ enum COORDINATE {
 /* table_data 번호 의미
 0 = " "
 1 ~ 7 -> o i s z l j t  /// color + ■
-11 ~ 17 -> solid(0, i, s, z, l, j, t)  /// color + ▣
+8 : T-block front
+9 : T-block back
+
 10 = wall  ///▩
+
+11 ~ 17 -> solid(0, i, s, z, l, j, t)  /// color + ▣
+
 -2 = ghost wall //▩
 -1 = "ghost"  /// □ (no color)
 */
@@ -258,29 +263,29 @@ const int block6[4][4][4] = {
 const int block7[4][4][4] = {
 		{
 						{0, 0, 0, 0},
-						{0, 7, 0, 0},
+						{8, 7, 8, 0},
 						{7, 7, 7, 0},
-						{0, 0, 0, 0}
+						{9, 0, 9, 0}
 		},
 		{
 						{0, 0, 0, 0},
-						{0, 7, 0, 0},
+						{9, 7, 8, 0},
 						{0, 7, 7, 0},
-						{0, 7, 0, 0}
+						{9, 7, 8, 0}
 
 		},
 		{
 						{0, 0, 0, 0},
-						{0, 0, 0, 0},
+						{9, 0, 9, 0},
 						{7, 7, 7, 0},
-						{0, 7, 0, 0}
+						{8, 7, 8, 0}
 
 		},
 		{
 						{0, 0, 0, 0},
-						{0, 7, 0, 0},
+						{8, 7, 9, 0},
 						{7, 7, 0, 0},
-						{0, 7, 0, 0}
+						{8, 7, 9, 0}
 
 		},
 
@@ -433,7 +438,7 @@ protected:
 	int table_data[LENGTH_X + LENGTH_NEXT_X][LENGTH_Y] = { };
 	int hold_data[8][4] = { };
 	int x = INITIAL_X + (LENGTH_X / 2 - 4), y = INITIAL_Y;
-	bool can_hold = true, Back_to_Back = false;
+	bool can_hold = true, Back_to_Back = false, T_Spin_Full = false, T_Spin_Mini = false;
 	unsigned int score = 0, combo = 0;
 	int deleted_line = 0;
 
@@ -799,6 +804,7 @@ protected:
 		}
 	}
 
+	//rotation -> T-Spin 검사
 	void Rotate_Plus() { // X or x or D or d
 		int angle = rot * 90;
 		int temp_x = x, temp_y = y;
@@ -827,10 +833,21 @@ protected:
 			rot--;
 			if (rot == -1) rot = 3;
 		}
-		gotoxy(0, 0);
-		printf("temp x, y = %d %d                  \n", temp_x, temp_y);
-		printf("angle = %d / preset = %d                     ", angle, preset);
+
+		if (Three_Corner_Rule()) {
+			if (Two_Corner_Rule()) {
+				T_Spin_Full = true;
+			}
+			else {
+				T_Spin_Mini = true;
+			}
+		}
+		else {
+			T_Spin_Full = false;
+			T_Spin_Mini = false;
+		}
 	}
+
 	void Rotate_Minus() { // Z or z or S or s
 		int angle = rot * 90;
 		int temp_x = x, temp_y = y;
@@ -858,10 +875,19 @@ protected:
 		if (Can_Block_Move() == false) { //preset 이후에도 회전 불가면 회전 안 함
 			rot++;
 			if (rot == 4) rot = 0;
+		}		
+		if (Three_Corner_Rule()) {
+			if (Two_Corner_Rule()) {
+				T_Spin_Full = true;
+			}
+			else {
+				T_Spin_Mini = true;
+			}
 		}
-		gotoxy(0, 0);
-		printf("temp x, y = %d %d                  \n", temp_x, temp_y);
-		printf("angle = %d / preset = %d                     ", angle, preset);
+		else {
+			T_Spin_Full = false;
+			T_Spin_Mini = false;
+		}
 	}
 	void Rotation_Preset(int angle, int preset, int plus)
 	{
@@ -915,11 +941,33 @@ protected:
 			}
 		}
 	}
-	void Three_Corner_Rule() {
-
+	bool Three_Corner_Rule() {
+		int count = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				if (block_shape[rot][j][i] == 8 || block_shape[rot][j][i] == 9) {
+					if (10 <= table_data[x - INITIAL_X + 2 * j][y - INITIAL_Y + i] && table_data[x - INITIAL_X + 2 * j][y - INITIAL_Y + i] <= 17) {
+						count++;
+					}
+				}
+			}
+		}
+		if (count >= 3) return true;
+		else return false;
 	}
-	void Two_Corner_Rule() {
-
+	bool Two_Corner_Rule() {
+		int count = 0;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				if (block_shape[rot][j][i] == 8) {
+					if (10 <= table_data[x - INITIAL_X + 2 * j][y - INITIAL_Y + i] && table_data[x - INITIAL_X + 2 * j][y - INITIAL_Y + i] <= 17) {
+						count++;
+					}
+				}
+			}
+		}
+		if (count >= 2) return true;
+		else return false;
 	}
 
 	bool Hold() {
@@ -1022,16 +1070,12 @@ protected:
 			}
 			else count = 0;
 		}
-		
-		//빈도수 고려함
-		/*
-		if (deleted_line == 2) {
-			if(t_spin)
-		}
-		*/
 	}
 	
 	void Clear_Lines_Score(int CONDITION, int Lines) {
+		if (T_Spin_Full) CONDITION = T_SPIN;
+		else if (T_Spin_Mini) CONDITION = T_SPIN_MINI;
+
 		if (CONDITION == JUST_DELETE) {
 			if (Lines == 1) score += 100, Back_to_Back = false;
 			else if (Lines == 2) score += 300, Back_to_Back = false;
@@ -1045,6 +1089,10 @@ protected:
 			if (Lines == 2) { if (Back_to_Back) score += 1800; else score += 1200, Back_to_Back = true; }
 			else if (Lines == 3) { if (Back_to_Back) score += 2400; else score += 1600, Back_to_Back = true; }
 			else { if (Back_to_Back) score += 1200; else score += 800, Back_to_Back = true; }
+		}
+		else { // T_SPIN_MINI
+			if(Lines == 1) { if (Back_to_Back) score += 300; else score += 200, Back_to_Back = true; }
+
 		}
 	}
 	void Drop_Score(int CONDITION) {
